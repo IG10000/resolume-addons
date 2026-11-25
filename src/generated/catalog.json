@@ -1,0 +1,1030 @@
+[
+ {
+  "plugin": "IM Slice Trace",
+  "style": "Liquid",
+  "desc": "White light flows around each LED slice like liquid. Streaks stretch, taper, split and drain away unpredictably, thinning to fine tips.",
+  "controls": [
+   "Slices",
+   "Centre slice width",
+   "Inset",
+   "Corner radius",
+   "Amount of light",
+   "Flow speed",
+   "Thickness",
+   "Glow"
+  ]
+ },
+ {
+  "plugin": "IM Slice Trace",
+  "style": "Mercury",
+  "desc": "Liquid metal running around each slice: rounded silver beads that swell, merge and split, catching a moving highlight.",
+  "controls": [
+   "Slices",
+   "Centre slice width",
+   "Inset",
+   "Corner radius",
+   "Amount of light",
+   "Flow speed",
+   "Thickness",
+   "Shine"
+  ]
+ },
+ {
+  "plugin": "IM Slice Trace",
+  "style": "Neon Liquid",
+  "desc": "The same liquid flow in colour: streams of neon whose hue drifts along the outline, with a white-hot core and soft bloom.",
+  "controls": [
+   "Slices",
+   "Centre slice width",
+   "Inset",
+   "Corner radius",
+   "Amount of light",
+   "Flow speed",
+   "Hue",
+   "Colour spread"
+  ]
+ },
+ {
+  "plugin": "IM Slice Trace",
+  "style": "Surge",
+  "desc": "Calm liquid streaks until the beat hits: then a surge pours from the top of each slice and races down both sides before draining away.",
+  "controls": [
+   "Slices",
+   "Centre slice width",
+   "Inset",
+   "Corner radius",
+   "Amount of light",
+   "Surge strength",
+   "Surge speed",
+   "Glow"
+  ]
+ },
+ {
+  "plugin": "IM Slice Trace",
+  "style": "Braid",
+  "desc": "Two liquid streams, one white and one in an accent colour, weave over and under each other as they flow around every slice.",
+  "controls": [
+   "Slices",
+   "Centre slice width",
+   "Inset",
+   "Corner radius",
+   "Amount of light",
+   "Flow speed",
+   "Braid width",
+   "Accent hue"
+  ]
+ },
+ {
+  "plugin": "IM Slice Trace",
+  "style": "Spill",
+  "desc": "The liquid outline spills light into each slice: wherever a streak flows, a soft wash bleeds inward and ripples, then fades as the streak moves on.",
+  "controls": [
+   "Slices",
+   "Centre slice width",
+   "Inset",
+   "Corner radius",
+   "Amount of light",
+   "Flow speed",
+   "Spill depth",
+   "Tint (0 = white)"
+  ]
+ },
+ {
+  "plugin": "IM Halo",
+  "style": "Glass Frame",
+  "desc": "A premium frosted-glass frame: the clip blurs into the glass band, a soft light glides along the inner edge, and the window casts a gentle shadow inward. Built for keynotes, award shows and concerts.",
+  "controls": [
+   "Width",
+   "Corner radius",
+   "Frost",
+   "Edge light",
+   "Glide speed",
+   "Hue",
+   "Tint",
+   "Beat breathe"
+  ]
+ },
+ {
+  "plugin": "IM Halo",
+  "style": "Aurora",
+  "desc": "A fine line of light around the frame with aurora colours flowing along it and soft curtains drifting inward.",
+  "controls": [
+   "Inset",
+   "Corner radius",
+   "Flow speed",
+   "Hue",
+   "Curtain depth",
+   "Beat lift"
+  ]
+ },
+ {
+  "plugin": "IM Halo",
+  "style": "Corners",
+  "desc": "Minimal broadcast framing: corner brackets that redraw every 4 bars, a hairline frame, ruler ticks, centre marks and a light that travels the edge.",
+  "controls": [
+   "Inset",
+   "Bracket length",
+   "Thickness",
+   "Detail lines",
+   "Hue",
+   "Colour amount",
+   "Beat pulse"
+  ]
+ },
+ {
+  "plugin": "IM Borders",
+  "style": "Chrome Ribbon",
+  "desc": "A liquid-metal frame that flows and ripples on the beat, with thin-film colour and a soft shadow cast onto your content.",
+  "controls": [
+   "Width",
+   "Flow",
+   "Iridescence",
+   "Beat ripple",
+   "Inner shadow",
+   "Detail"
+  ]
+ },
+ {
+  "plugin": "IM Borders",
+  "style": "Bulb Marquee",
+  "desc": "A theatre marquee of light bulbs around the frame. The chase pattern changes every bar: run, blink, opposing comets, sparkle.",
+  "controls": [
+   "Inset",
+   "Bulb count",
+   "Glow",
+   "Chase speed",
+   "Warm \u2192 rainbow",
+   "Housing"
+  ]
+ },
+ {
+  "plugin": "IM Aura",
+  "style": "Edge Flow",
+  "desc": "An energy aura streams off the outline of whoever is on camera, rising and swirling like heat, with colour drifting through it. Kicks flare it up.",
+  "controls": [
+   "Edge sensitivity",
+   "Rise",
+   "Persistence",
+   "Turbulence",
+   "Hue",
+   "Hue spread",
+   "Darken feed"
+  ]
+ },
+ {
+  "plugin": "IM Aura",
+  "style": "Flame",
+  "desc": "Flames rise off the performer\u2019s outline and cool from white-hot to deep red as they climb. Set Flame hue for blue or green fire.",
+  "controls": [
+   "Reach",
+   "Rise",
+   "Turbulence",
+   "Height",
+   "Flame hue",
+   "Darken background",
+   "Person in front",
+   "Brightness key"
+  ]
+ },
+ {
+  "plugin": "IM Aura",
+  "style": "Aura Photo",
+  "desc": "Inspired by aura-camera portraits: soft clouds of colour bloom around the person like a double exposure, with an instant-film finish.",
+  "controls": [
+   "Reach",
+   "Drift",
+   "Hue",
+   "Darken background",
+   "Intensity",
+   "Wash over subject",
+   "Film finish",
+   "Brightness key"
+  ]
+ },
+ {
+  "plugin": "IM Aura",
+  "style": "Electric",
+  "desc": "Crackling plasma arcs branch off the performer, flickering between beats and surging outward on every kick.",
+  "controls": [
+   "Reach",
+   "Crackle rate",
+   "Detail",
+   "Hue",
+   "Darken background",
+   "Beat surge",
+   "Person in front",
+   "Brightness key"
+  ]
+ },
+ {
+  "plugin": "IM Aura",
+  "style": "Embers",
+  "desc": "Glowing embers drift up through a soft halo around the performer, twinkling as they rise. Kicks brighten them.",
+  "controls": [
+   "Reach",
+   "Ember size",
+   "Rise speed",
+   "Density",
+   "Hue",
+   "Darken background",
+   "Halo glow",
+   "Brightness key"
+  ]
+ },
+ {
+  "plugin": "IM Aura",
+  "style": "Rings",
+  "desc": "Outline-shaped rings ripple outward from the performer like sonar, with a bright shock ring on every beat.",
+  "controls": [
+   "Reach",
+   "Ring count",
+   "Speed",
+   "Thickness",
+   "Hue",
+   "Rainbow",
+   "Darken background",
+   "Brightness key"
+  ]
+ },
+ {
+  "plugin": "IM Aura",
+  "style": "Neon Stroke",
+  "desc": "Stacked neon outlines trace the performer at growing distances, each its own colour, breathing outward on the beat.",
+  "controls": [
+   "Reach",
+   "Strokes",
+   "Thickness",
+   "Glow",
+   "Hue",
+   "Rainbow",
+   "Beat breathe",
+   "Brightness key"
+  ]
+ },
+ {
+  "plugin": "IM Aura",
+  "style": "Ghost Trail",
+  "desc": "Coloured ghost silhouettes from the last moments trail behind the performer, so every move leaves a spectral echo.",
+  "controls": [
+   "Ghosts",
+   "Spacing",
+   "Drift",
+   "Rainbow",
+   "Hue",
+   "Darken background",
+   "Ghost opacity",
+   "Brightness key"
+  ]
+ },
+ {
+  "plugin": "IM Aura",
+  "style": "Radiance",
+  "desc": "Shafts of light burst outward from behind the performer, a heavenly walk-on glow with a shimmer in the rays.",
+  "controls": [
+   "Ray length",
+   "Shimmer",
+   "Hue",
+   "Saturation",
+   "Darken background",
+   "Centre height",
+   "Intensity",
+   "Brightness key"
+  ]
+ },
+ {
+  "plugin": "IM Live Looks",
+  "style": "Cinema",
+  "desc": "Turns a live camera into a film: teal-and-orange grade, filmic highlights, red halation glow, grain, gate weave and an optional 2.39 letterbox.",
+  "controls": [
+   "Grade",
+   "Letterbox",
+   "Halation",
+   "Grain",
+   "Gate weave",
+   "Vignette",
+   "Bloom",
+   "Exposure"
+  ]
+ },
+ {
+  "plugin": "IM Live Looks",
+  "style": "Dream Bloom",
+  "desc": "A beauty glow for live feeds: soft diffusion, prism fringes, four-point star glints on highlights, a pastel grade and drifting light leaks.",
+  "controls": [
+   "Diffusion",
+   "Prism",
+   "Star glints",
+   "Star length",
+   "Pastel grade",
+   "Light leak",
+   "Glint threshold"
+  ]
+ },
+ {
+  "plugin": "IM Live Looks",
+  "style": "VHS Camcorder",
+  "desc": "The live feed as a 90s camcorder tape: line wobble, a rolling tracking band, chroma bleed, tape noise, dropouts, head-switching at the bottom and a blinking REC dot.",
+  "controls": [
+   "Wobble",
+   "Tracking",
+   "Chroma bleed",
+   "Tape noise",
+   "Softness",
+   "Colour fade",
+   "REC dot"
+  ]
+ },
+ {
+  "plugin": "IM Live Looks",
+  "style": "Pop Duotone",
+  "desc": "Screen-print poster look: posterised duotone, halftone dots, bold outlines and off-register ink. The palette can flip every bar.",
+  "controls": [
+   "Hue",
+   "Colour levels",
+   "Halftone",
+   "Outline",
+   "Misregister",
+   "Swap palette every bar"
+  ]
+ },
+ {
+  "plugin": "IM Live Looks",
+  "style": "Thermal",
+  "desc": "Thermal-camera look for live feeds: iron, rainbow or arctic palettes, white-hot or black-hot, a scale bar and crosshair, and a heat pulse on the beat.",
+  "controls": [
+   "Contrast",
+   "Palette",
+   "Black-hot",
+   "Smoothing",
+   "Scale and crosshair",
+   "Beat heat",
+   "Sensor noise"
+  ]
+ },
+ {
+  "plugin": "IM Live FX",
+  "style": "Hologram",
+  "desc": "The performer as a projected hologram: tinted light, scanlines, edge glow, flicker, glitch tears on the beat, and a projector beam. Dark areas fall away.",
+  "controls": [
+   "Hue",
+   "Scanlines",
+   "Glitch",
+   "Edge glow",
+   "Flicker",
+   "Background",
+   "Beam",
+   "Brightness key"
+  ]
+ },
+ {
+  "plugin": "IM Live FX",
+  "style": "Point Cloud",
+  "desc": "The live feed rebuilt as a 3D cloud of glowing points, pushed forward by brightness and orbiting slowly like a volumetric capture. Kicks punch the depth.",
+  "controls": [
+   "Density",
+   "Orbit speed",
+   "Orbit angle",
+   "Depth",
+   "Dot size",
+   "Glow",
+   "Single colour",
+   "Brightness key"
+  ]
+ },
+ {
+  "plugin": "IM Live FX",
+  "style": "Clone Wall",
+  "desc": "The live feed repeated in a grid, each tile a few frames behind the last so movement ripples across the wall. Pop colours per tile, and the order can reshuffle on the beat.",
+  "controls": [
+   "Grid",
+   "Delay per tile",
+   "Colour mode",
+   "Gap",
+   "Zoom",
+   "Shuffle on beat"
+  ]
+ },
+ {
+  "plugin": "IM Caustics",
+  "style": "Classic",
+  "desc": "Underwater light caustics dance across the clip and bend it, like the whole stage is at the bottom of a pool.",
+  "controls": [
+   "Scale",
+   "Speed",
+   "Intensity",
+   "Refraction",
+   "Tint",
+   "Deep water"
+  ]
+ },
+ {
+  "plugin": "IM Caustics",
+  "style": "God Rays",
+  "desc": "Deep-water look: caustics on the clip, slanted light shafts falling from the surface and drifting particles.",
+  "controls": [
+   "Scale",
+   "Speed",
+   "Caustic strength",
+   "Ray strength",
+   "Particles",
+   "Deep water"
+  ]
+ },
+ {
+  "plugin": "IM Caustics",
+  "style": "Prism",
+  "desc": "Caustics split into red, green and blue so every light line carries a rainbow fringe, over a darkened, refracted clip.",
+  "controls": [
+   "Scale",
+   "Speed",
+   "Intensity",
+   "Dispersion",
+   "Darken clip",
+   "Refraction"
+  ]
+ },
+ {
+  "plugin": "IM Caustics",
+  "style": "Raindrops",
+  "desc": "Drops land on the beat and send rippling rings across the clip, bending it and catching highlights, over a faint caustic floor.",
+  "controls": [
+   "Drops",
+   "Ripple speed",
+   "Persistence",
+   "Refraction",
+   "Highlight",
+   "Caustic floor"
+  ]
+ },
+ {
+  "plugin": "IM Ink",
+  "style": "Ink Bloom",
+  "desc": "An organic ink mask that blooms open and closes again over 1, 2, 4 or 8 beats, with a glowing wet edge.",
+  "controls": [
+   "Cycle",
+   "Detail",
+   "Edge",
+   "Ink hue",
+   "Hidden look",
+   "Warp"
+  ]
+ },
+ {
+  "plugin": "IM Ink",
+  "style": "Smoke",
+  "desc": "The clip rises out of darkness through drifting smoke and sinks back, with soft lit wisps along the edge.",
+  "controls": [
+   "Cycle",
+   "Detail",
+   "Softness",
+   "Smoke tint",
+   "Hidden glow",
+   "Turbulence"
+  ]
+ },
+ {
+  "plugin": "IM Ink",
+  "style": "Burn",
+  "desc": "The clip burns away like paper, with a flame front, charred edge, heat shimmer and embers, then reforms.",
+  "controls": [
+   "Cycle",
+   "Detail",
+   "Flame width",
+   "Flame hue",
+   "Embers",
+   "Heat haze"
+  ]
+ },
+ {
+  "plugin": "IM Ink",
+  "style": "Watercolour",
+  "desc": "Three pigment drops bloom across the frame with dark rims and paper grain, revealing the clip tinted in their colours. New drops each cycle.",
+  "controls": [
+   "Cycle",
+   "Spread",
+   "Edge darkening",
+   "Pigment hue",
+   "Paper",
+   "Granulation"
+  ]
+ },
+ {
+  "plugin": "IM Reveal",
+  "style": "Type Cutout",
+  "desc": "The clip shows only through a giant word that punches on the beat. Raise Rows to tile it into scrolling lines.",
+  "controls": [
+   "Scale",
+   "Outside dim",
+   "Motion",
+   "Glow",
+   "Rows",
+   "Hue"
+  ]
+ },
+ {
+  "plugin": "IM Reveal",
+  "style": "Flip Grid",
+  "desc": "The frame splits into tiles that flip over in a 3D wave every bar, revealing a hue-shifted back side. The wave origin alternates.",
+  "controls": [
+   "Tile rows",
+   "Flip speed",
+   "Stagger",
+   "Back look",
+   "Gap",
+   "Perspective"
+  ]
+ },
+ {
+  "plugin": "IM Reveal",
+  "style": "Disintegrate",
+  "desc": "The clip crumbles into glowing particles that blow away on the wind, then reassembles, over 2 to 16 beats.",
+  "controls": [
+   "Cycle",
+   "Grain size",
+   "Drift",
+   "Ember glow",
+   "Turbulence",
+   "Ember hue"
+  ]
+ },
+ {
+  "plugin": "IM Type",
+  "style": "Carousel",
+  "desc": "The scrolling word rows from the Kinetic type source, now as an effect: alternating directions, outline rows, a light sweep, and optional beat-snapped motion. Change the word in Word.",
+  "controls": [
+   "Rows",
+   "Speed",
+   "Beat snap",
+   "Outline every other row",
+   "Hue",
+   "Fill letters with clip",
+   "Background",
+   "Shine"
+  ]
+ },
+ {
+  "plugin": "IM Type",
+  "style": "Wave",
+  "desc": "Word rows ride a travelling sine wave while they scroll, like a flag in the wind. Kicks make the wave surge.",
+  "controls": [
+   "Rows",
+   "Wave speed",
+   "Amplitude",
+   "Frequency",
+   "Hue",
+   "Fill letters with clip",
+   "Background",
+   "Scroll"
+  ]
+ },
+ {
+  "plugin": "IM Type",
+  "style": "Cylinder",
+  "desc": "The word wrapped around spinning 3D drums, a literal carousel. You see the back of the drum through the gaps.",
+  "controls": [
+   "Drums",
+   "Speed",
+   "Radius",
+   "Words around drum",
+   "Hue",
+   "Fill letters with clip",
+   "Background",
+   "Beat snap"
+  ]
+ },
+ {
+  "plugin": "IM Type",
+  "style": "Slam",
+  "desc": "On every beat a row slams in from alternating sides with overshoot, motion blur and a flash, building a stack.",
+  "controls": [
+   "Rows",
+   "Slam time",
+   "Overshoot",
+   "Motion blur",
+   "Hue",
+   "Fill letters with clip",
+   "Background",
+   "Flash"
+  ]
+ },
+ {
+  "plugin": "IM Type",
+  "style": "Echo Stack",
+  "desc": "A solid word at the centre throws a stream of outline copies that grow outward through the colour wheel. Beats push the stream.",
+  "controls": [
+   "Copies",
+   "Speed",
+   "Spread",
+   "Size",
+   "Hue",
+   "Rainbow",
+   "Fill letters with clip",
+   "Background"
+  ]
+ },
+ {
+  "plugin": "IM Type Source",
+  "style": "Carousel",
+  "desc": "The scrolling word rows from the Kinetic type source, now as an effect: alternating directions, outline rows, a light sweep, and optional beat-snapped motion. Change the word in Word.",
+  "controls": [
+   "Rows",
+   "Speed",
+   "Beat snap",
+   "Outline every other row",
+   "Hue",
+   "Fill letters with clip",
+   "Background",
+   "Shine"
+  ]
+ },
+ {
+  "plugin": "IM Type Source",
+  "style": "Wave",
+  "desc": "Word rows ride a travelling sine wave while they scroll, like a flag in the wind. Kicks make the wave surge.",
+  "controls": [
+   "Rows",
+   "Wave speed",
+   "Amplitude",
+   "Frequency",
+   "Hue",
+   "Fill letters with clip",
+   "Background",
+   "Scroll"
+  ]
+ },
+ {
+  "plugin": "IM Type Source",
+  "style": "Cylinder",
+  "desc": "The word wrapped around spinning 3D drums, a literal carousel. You see the back of the drum through the gaps.",
+  "controls": [
+   "Drums",
+   "Speed",
+   "Radius",
+   "Words around drum",
+   "Hue",
+   "Fill letters with clip",
+   "Background",
+   "Beat snap"
+  ]
+ },
+ {
+  "plugin": "IM Type Source",
+  "style": "Slam",
+  "desc": "On every beat a row slams in from alternating sides with overshoot, motion blur and a flash, building a stack.",
+  "controls": [
+   "Rows",
+   "Slam time",
+   "Overshoot",
+   "Motion blur",
+   "Hue",
+   "Fill letters with clip",
+   "Background",
+   "Flash"
+  ]
+ },
+ {
+  "plugin": "IM Type Source",
+  "style": "Echo Stack",
+  "desc": "A solid word at the centre throws a stream of outline copies that grow outward through the colour wheel. Beats push the stream.",
+  "controls": [
+   "Copies",
+   "Speed",
+   "Spread",
+   "Size",
+   "Hue",
+   "Rainbow",
+   "Fill letters with clip",
+   "Background"
+  ]
+ },
+ {
+  "plugin": "IM Stylize",
+  "style": "LED Wall",
+  "desc": "Rebuilds the clip as an LED panel with RGB sub-pixels, bloom and a beat ripple. Crossfade to a rotated halftone.",
+  "controls": [
+   "Pitch",
+   "Bloom",
+   "Ripple",
+   "LED to halftone",
+   "Gap",
+   "Saturation"
+  ]
+ },
+ {
+  "plugin": "IM Stylize",
+  "style": "Contour",
+  "desc": "Topographic lines traced from the clip\u2019s brightness, flowing downhill and cycling through the palette.",
+  "controls": [
+   "Lines",
+   "Speed",
+   "Width",
+   "Black background",
+   "Palette",
+   "Smoothness"
+  ]
+ },
+ {
+  "plugin": "IM Stylize",
+  "style": "Edge Neon",
+  "desc": "Traces every outline in the clip as glowing neon tubing, coloured by edge direction, over a dimmed or black background.",
+  "controls": [
+   "Threshold",
+   "Glow",
+   "Background",
+   "Hue",
+   "Hue spread",
+   "Thickness"
+  ]
+ },
+ {
+  "plugin": "IM Stylize",
+  "style": "ASCII",
+  "desc": "Rebuilds the clip from text characters by brightness, with glyph flicker and a beat wave rolling down the screen.",
+  "controls": [
+   "Cell size",
+   "Clip colours to single colour",
+   "Contrast",
+   "Flicker",
+   "Single colour hue",
+   "Background"
+  ]
+ },
+ {
+  "plugin": "IM Stylize",
+  "style": "Rutt-Etra",
+  "desc": "The classic analogue video-synth look: scanlines lifted into 3D by brightness, tilted like a landscape.",
+  "controls": [
+   "Lines",
+   "Height",
+   "Thickness",
+   "Tilt",
+   "Clip colours to neon",
+   "Glow"
+  ]
+ },
+ {
+  "plugin": "IM Stylize",
+  "style": "Op-Art",
+  "desc": "Bold black-and-white line fields bent by the clip\u2019s brightness, with moir\u00e9 interference and a beat pulse rippling outward.",
+  "controls": [
+   "Density",
+   "Warp",
+   "Moir\u00e9",
+   "Pulse",
+   "Ink colour (0 = black)",
+   "Paper from clip"
+  ]
+ },
+ {
+  "plugin": "IM Echo",
+  "style": "Tunnel",
+  "desc": "Every frame is fed back into the next, zoomed, rotated and hue-shifted, for endless trails. Key sets what cuts through.",
+  "controls": [
+   "Zoom",
+   "Rotate",
+   "Hue drift",
+   "Decay",
+   "Cut-through level",
+   "Drift"
+  ]
+ },
+ {
+  "plugin": "IM Echo",
+  "style": "Kaleido",
+  "desc": "Feedback folded through a kaleidoscope, so the trails grow into a living mandala.",
+  "controls": [
+   "Segments",
+   "Zoom",
+   "Rotate",
+   "Hue drift",
+   "Decay",
+   "Cut-through level"
+  ]
+ },
+ {
+  "plugin": "IM Echo",
+  "style": "Vortex",
+  "desc": "Trails get pulled into a spinning vortex at the centre, cycling colour with every generation. Kicks tighten the spin.",
+  "controls": [
+   "Pull",
+   "Twist",
+   "Hue drift",
+   "Decay",
+   "Cut-through level",
+   "Core glow"
+  ]
+ },
+ {
+  "plugin": "IM Echo",
+  "style": "Stutter",
+  "desc": "Beat-quantised freeze-frames: copies of the bright parts are stamped on every 1/2, 1/4 or 1/8 note and trail behind like a multi-exposure photo.",
+  "controls": [
+   "Rate",
+   "Copies",
+   "Drift",
+   "Persistence",
+   "Tint hue",
+   "Tint amount"
+  ]
+ },
+ {
+  "plugin": "IM Melt",
+  "style": "Paint",
+  "desc": "Feedback pushed through a curl-noise flow field, so the clip smears and swirls like wet paint. Beats stir it harder.",
+  "controls": [
+   "Flow",
+   "Decay",
+   "Scale",
+   "Inject",
+   "Turbulence",
+   "Colour bleed"
+  ]
+ },
+ {
+  "plugin": "IM Melt",
+  "style": "Drip",
+  "desc": "Wet paint running down a wall: trails slide downward at uneven speeds with a sideways wobble.",
+  "controls": [
+   "Flow",
+   "Decay",
+   "Wobble",
+   "Inject",
+   "Drip variance",
+   "Colour bleed"
+  ]
+ },
+ {
+  "plugin": "IM Melt",
+  "style": "Marble",
+  "desc": "Orbiting vortices swirl the trails into marbled paper patterns, with the clip combed in as stripes.",
+  "controls": [
+   "Swirl",
+   "Decay",
+   "Vortices",
+   "Inject",
+   "Comb density",
+   "Colour bleed"
+  ]
+ },
+ {
+  "plugin": "IM Melt",
+  "style": "Inferno",
+  "desc": "The clip feeds a fire: heat rises through curling turbulence and cools from white to yellow to red to black.",
+  "controls": [
+   "Rise",
+   "Cooling",
+   "Turbulence",
+   "Fuel",
+   "Flame hue",
+   "Clip mix"
+  ]
+ },
+ {
+  "plugin": "IM Time",
+  "style": "Slit Scan",
+  "desc": "Each slice of the frame shows a different moment in the last second, so motion stretches and bends through time.",
+  "controls": [
+   "Direction",
+   "Depth",
+   "Reverse",
+   "Mix",
+   "Wave"
+  ]
+ },
+ {
+  "plugin": "IM Time",
+  "style": "RGB Time Split",
+  "desc": "Red, green and blue each lag by a different number of frames, so anything moving tears into colour ghosts. Beats stretch the gap.",
+  "controls": [
+   "Red delay",
+   "Green delay",
+   "Blue delay",
+   "Beat pump",
+   "Echo trails",
+   "Saturation"
+  ]
+ },
+ {
+  "plugin": "IM Time",
+  "style": "Time Tiles",
+  "desc": "Datamosh-style tiles, each replaying a different moment from the frame buffer, reshuffled on the beat.",
+  "controls": [
+   "Tiles",
+   "Max delay",
+   "Amount",
+   "Split depth",
+   "Borders",
+   "Shuffle"
+  ]
+ },
+ {
+  "plugin": "IM Liquid Wipe",
+  "style": "Liquid Wipe",
+  "desc": "B floods in behind an organic liquid front with a glowing rim that bends both pictures as it passes. Set any angle.",
+  "controls": [
+   "Angle",
+   "Turbulence",
+   "Rim glow",
+   "Rim colour (0 = white)"
+  ]
+ },
+ {
+  "plugin": "IM Flash Burn",
+  "style": "Flash Burn",
+  "desc": "A blows out into a bright overexposed flash with bloom and lens streaks, and B emerges from the light. The classic keynote reveal, turned up.",
+  "controls": [
+   "Warm \u2194 cool",
+   "Streaks",
+   "Bloom",
+   "Peak"
+  ]
+ },
+ {
+  "plugin": "IM Whip Zoom",
+  "style": "Whip Zoom",
+  "desc": "A rockets into the screen with radial blur, a twist and colour split, and B whips back out of it. Punchy for drops.",
+  "controls": [
+   "Zoom",
+   "RGB split",
+   "Twist",
+   "Flash"
+  ]
+ },
+ {
+  "plugin": "IM Slice Slide",
+  "style": "Slice Slide",
+  "desc": "The frame splits into strips that slide away in alternating directions with a staggered, eased motion and motion blur, carrying B in behind them.",
+  "controls": [
+   "Slices",
+   "Horizontal",
+   "Stagger",
+   "Seam glow"
+  ]
+ },
+ {
+  "plugin": "IM Smoke Reveal",
+  "style": "Smoke Reveal",
+  "desc": "A dissolves into rising smoke and B forms out of it, with soft lit wisps along the edge.",
+  "controls": [
+   "Detail",
+   "Softness",
+   "Smoke tint",
+   "Turbulence"
+  ]
+ },
+ {
+  "plugin": "IM Pixel Stream",
+  "style": "Pixel Stream",
+  "desc": "Rows of A smear sideways into pixel-sorted streaks at random times, and B is left behind as they rush off. Clean digital chaos.",
+  "controls": [
+   "Row size",
+   "Streak length",
+   "Glitch colour",
+   "Right to left"
+  ]
+ },
+ {
+  "plugin": "IM Halo Iris",
+  "style": "Halo Iris",
+  "desc": "B opens out of the centre inside an expanding ring of light that wobbles like liquid and bends both pictures at its edge.",
+  "controls": [
+   "Ring glow",
+   "Refraction",
+   "Ring colour (0 = white)",
+   "Wobble"
+  ]
+ },
+ {
+  "plugin": "IM Cube Turn",
+  "style": "Cube Turn",
+  "desc": "A and B on two faces of a 3D cube that swings round, pulling back mid-turn so you feel the depth, with light falling across the faces.",
+  "controls": [
+   "Pull back",
+   "Turn left",
+   "Edge light",
+   "Background"
+  ]
+ },
+ {
+  "plugin": "IM Glow Dissolve",
+  "style": "Glow Dissolve",
+  "desc": "B burns through A starting from the brightest parts (or the darkest), with a glowing line of light tracing the dissolve.",
+  "controls": [
+   "Edge glow",
+   "Edge colour (0 = white)",
+   "Darks first",
+   "Softness"
+  ]
+ },
+ {
+  "plugin": "IM Spectrum",
+  "style": "Spectrum Split",
+  "desc": "Red, green and blue tear apart in three directions, each swapping from A to B at its own moment, then snap back together on B.",
+  "controls": [
+   "Spread",
+   "Angle",
+   "Smear",
+   "Flash"
+  ]
+ }
+]

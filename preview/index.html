@@ -1,0 +1,2452 @@
+<title>IMMINENCE FX Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: VJ console. Output monitor dominates on the left, effect rack on the right; stacks on phones. Single dark look on purpose (it is a stage tool). */
+:root{
+  --bg:#08090d;
+  --panel:#10121a;
+  --panel-2:#161925;
+  --line:#242838;
+  --fg:#e9ebf3;
+  --muted:#8a90a6;
+  --accent:#a48bff;
+  --accent-ink:#0d0920;
+  --live:#ff4d61;
+  --display:"Unbounded","Arial Black",system-ui,sans-serif;
+  --body:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  color-scheme:dark;
+}
+html,body{background:var(--bg);color:var(--fg)}
+body{font-family:var(--body);font-size:14px;line-height:1.5}
+.wrap{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 28px;max-width:1680px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:12px}
+.brand{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.brand h1{font-family:var(--display);font-weight:900;font-size:clamp(20px,3vw,30px);letter-spacing:.02em;margin:0;line-height:1;
+  background:linear-gradient(90deg,#ffb36b,#ff4d8d 40%,#a48bff 75%,#6bd6ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.brand span{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.top .meta{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}
+@media (max-width:960px){.grid{grid-template-columns:minmax(0,1fr)}}
+.stage{display:flex;flex-direction:column;gap:12px;min-width:0}
+.monitor{position:relative;aspect-ratio:16/9;max-width:100%;background:#000;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.monitor canvas{display:block;width:100%;height:100%}
+.monitor:fullscreen{border:0;border-radius:0;aspect-ratio:auto;width:100vw;height:100vh}
+.osd{position:absolute;font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.8);pointer-events:none}
+.osd.tl{top:12px;left:14px;display:flex;flex-direction:column;gap:2px}
+.osd.tl strong{font-family:var(--display);font-weight:700;font-size:15px;letter-spacing:.04em;text-transform:none}
+.osd.tl span{color:rgba(255,255,255,.65)}
+.osd.tr{top:14px;right:14px;display:flex;gap:6px;align-items:center}
+.osd.tr i{width:9px;height:9px;border-radius:50%;border:1px solid rgba(255,255,255,.55);display:block}
+.osd.tr i.on{background:#fff;border-color:#fff;box-shadow:0 0 10px #fff}
+.osd.tr i.on.down{background:var(--live);border-color:var(--live);box-shadow:0 0 12px var(--live)}
+.osd.bl{bottom:12px;left:14px;background:var(--live);color:#fff;padding:3px 8px;border-radius:3px;text-shadow:none}
+.err{position:absolute;inset:auto 12px 12px 12px;font-family:var(--mono);font-size:11px;color:#ffd0d6;background:rgba(40,0,8,.85);border:1px solid var(--live);padding:8px 10px;border-radius:4px;max-height:40%;overflow:auto;white-space:pre-wrap}
+.transport{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:10px 12px}
+.tgroup{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tlabel{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:5px;overflow:hidden}
+.seg button{border:0;border-right:1px solid var(--line);border-radius:0}
+.seg button:last-child{border-right:0}
+button,.btn{font:600 12px/1 var(--body);color:var(--fg);background:var(--panel-2);border:1px solid var(--line);border-radius:5px;padding:8px 11px;cursor:pointer;white-space:nowrap}
+button:hover{border-color:#3a4058;background:#1c2030}
+button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button.hold[aria-pressed="true"]{background:var(--live);border-color:var(--live);color:#fff}
+input[type=number],input[type=text]{font:500 13px/1 var(--mono);color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:5px;padding:7px 8px}
+input[type=number]{width:64px}
+input[type=text]{width:120px;text-transform:uppercase}
+.note{margin:0;color:var(--muted);font-size:13px;max-width:72ch}
+.rack{display:flex;flex-direction:column;gap:12px;min-width:0}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:12px}
+.cat{display:grid;grid-template-columns:78px minmax(0,1fr);gap:8px;align-items:start;padding-block:6px;border-bottom:1px dashed var(--line)}
+.cat:last-child{border-bottom:0}
+.cat h3{margin:0;padding-top:7px;font-family:var(--mono);font-weight:500;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips button{padding:7px 10px;display:inline-flex;align-items:center;gap:6px}
+.chips .new{font:500 9px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:#ffb36b;border:1px solid rgba(255,179,107,.45);border-radius:3px;padding:2px 3px}
+.chips button[aria-pressed="true"] .new{color:var(--accent-ink);border-color:var(--accent-ink)}
+.params h2{font-family:var(--display);font-weight:700;font-size:18px;margin:0 0 4px;letter-spacing:.01em;text-wrap:balance}
+.params p{margin:0 0 12px;color:var(--muted);font-size:13px}
+.slider{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 8px;margin-bottom:10px}
+.slider label{font-size:12px;font-weight:600}
+.slider output{font-family:var(--mono);font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.slider input{grid-column:1/-1;width:100%;accent-color:var(--accent)}
+.prow{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:4px}
+.keys{font-family:var(--mono);font-size:10.5px;color:var(--muted);letter-spacing:.04em}
+kbd{font-family:var(--mono);font-size:10px;border:1px solid var(--line);border-bottom-width:2px;border-radius:3px;padding:1px 4px;color:var(--fg)}
+@media (max-width:520px){.cat{grid-template-columns:minmax(0,1fr)}.cat h3{padding-top:0}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <h1>IMMINENCE</h1>
+      <span>FX Lab · FFGL preview</span>
+    </div>
+    <div class="meta" id="meta">31 effects · 7 categories</div>
+  </header>
+
+  <main class="grid">
+    <section class="stage">
+      <div class="monitor" id="monitor">
+        <canvas id="out" aria-label="Effect output preview"></canvas>
+        <div class="osd tl"><span id="osdCat">Borders</span><strong id="osdName">Lightrunner</strong></div>
+        <div class="osd tr" id="beatDots" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+        <div class="osd bl" id="osdBypass" hidden>Bypass</div>
+        <div class="err" id="err" hidden></div>
+      </div>
+
+      <div class="transport">
+        <div class="tgroup">
+          <span class="tlabel">Source</span>
+          <div class="seg" id="srcSeg">
+            <button id="srcLoop" data-src="loop" aria-pressed="false">Neon loop</button>
+            <button id="srcType" data-src="type" aria-pressed="false">Kinetic type</button>
+            <button id="srcStage" data-src="stage" aria-pressed="true">Stage cam</button>
+            <button id="srcClip" data-src="clip" aria-pressed="false">Your clip…</button>
+          </div>
+          <input id="clipFile" type="file" accept="video/*,image/*" hidden>
+        </div>
+        <div class="tgroup">
+          <label class="tlabel" for="bpm">BPM</label>
+          <input id="bpm" type="number" min="40" max="220" step="0.1" value="124">
+          <button id="tap">Tap</button>
+        </div>
+        <div class="tgroup">
+          <label class="tlabel" for="word">Word</label>
+          <input id="word" type="text" maxlength="10" value="PULSE" spellcheck="false">
+        </div>
+        <div class="tgroup">
+          <button id="bypass" class="hold" aria-pressed="false" title="Hold to compare with the dry clip">Hold: bypass</button>
+          <button id="reel" aria-pressed="false" title="Switch effect every 16 beats">Showreel</button>
+          <button id="pause" aria-pressed="false">Pause</button>
+          <button id="fs">Fullscreen</button>
+        </div>
+      </div>
+      <p class="note">Each effect is one GLSL shader that ports to its own FFGL plugin for Resolume Arena. The Time effects also keep a 48-frame buffer, which a plugin can do too. The sliders become the plugin's parameters, and the beat clock here stands in for Arena's BPM. Load one of your own clips to see the effects on real content.</p>
+    </section>
+
+    <aside class="rack">
+      <div class="panel" id="fxlist" aria-label="Effects"></div>
+      <div class="panel params">
+        <h2 id="pName">Lightrunner</h2>
+        <p id="pDesc"></p>
+        <div id="sliders"></div>
+        <div class="prow">
+          <button id="reset">Reset parameters</button>
+          <span class="keys"><kbd>←</kbd><kbd>→</kbd> effect · <kbd>Space</kbd> tap · <kbd>B</kbd> bypass</span>
+        </div>
+      </div>
+    </aside>
+  </main>
+</div>
+
+<script>
+(() => {
+'use strict';
+
+/* ---------- shared GLSL ---------- */
+const PRELUDE = `#version 300 es
+precision highp float;
+precision highp sampler2DArray;
+uniform sampler2D uSrc;
+uniform sampler2D uPrev;
+uniform sampler2D uText;
+uniform sampler2D uClip;
+uniform vec2 uRes;
+uniform float uTime;
+uniform float uBeat;
+uniform float uBeats;
+uniform float uClipAspect;
+uniform float uP0;
+uniform float uP1;
+uniform float uP2;
+uniform float uP3;
+uniform float uP4;
+uniform float uP5;
+uniform float uP6;
+uniform float uP7;
+uniform float uFPB;
+uniform sampler2DArray uHist;
+uniform float uHead;
+uniform sampler2D uGlyph;
+uniform sampler2D uSrc2;
+in vec2 vUv;
+out vec4 fragColor;
+float gA=1.;
+#define PI 3.14159265359
+#define TAU 6.28318530718
+float h11(float p){p=fract(p*.1031);p*=p+33.33;p*=p+p;return fract(p);}
+float h21(vec2 p){vec3 p3=fract(vec3(p.xyx)*.1031);p3+=dot(p3,p3.yzx+33.33);return fract((p3.x+p3.y)*p3.z);}
+vec2 h22(vec2 p){vec3 p3=fract(vec3(p.xyx)*vec3(.1031,.1030,.0973));p3+=dot(p3,p3.yzx+33.33);return fract((p3.xx+p3.yz)*p3.zy);}
+float vnoise(vec2 p){vec2 i=floor(p),f=fract(p);vec2 u=f*f*(3.-2.*f);
+  return mix(mix(h21(i),h21(i+vec2(1.,0.)),u.x),mix(h21(i+vec2(0.,1.)),h21(i+vec2(1.,1.)),u.x),u.y);}
+float fbm(vec2 p){float a=.5,s=0.;mat2 m=mat2(1.6,1.2,-1.2,1.6);for(int i=0;i<5;i++){s+=a*vnoise(p);p=m*p;a*=.5;}return s;}
+vec3 hsv(float h,float s,float v){vec3 k=clamp(abs(mod(h*6.+vec3(0.,4.,2.),6.)-3.)-1.,0.,1.);return v*mix(vec3(1.),k,s);}
+vec3 pal(float t){return .5+.5*cos(TAU*(t+vec3(0.,.33,.67)));}
+float luma(vec3 c){return dot(c,vec3(.2126,.7152,.0722));}
+mat2 rot(float a){float c=cos(a),s=sin(a);return mat2(c,-s,s,c);}
+vec3 hue(vec3 c,float a){const vec3 k=vec3(.57735);float ca=cos(a);return c*ca+cross(k,c)*sin(a)+k*dot(k,c)*(1.-ca);}
+float kick(){return exp(-uBeat*5.);}
+vec2 aspect(){return vec2(uRes.x/uRes.y,1.);}
+vec4 src(vec2 uv){return texture(uSrc,uv);}
+vec3 prevf(vec2 uv){vec2 e=smoothstep(0.,.004,uv)*smoothstep(1.,.996,uv);return texture(uPrev,uv).rgb*e.x*e.y;}
+float sdRB(vec2 p,vec2 b,float r){vec2 q=abs(p)-b+r;return length(max(q,0.))+min(max(q.x,q.y),0.)-r;}
+#define HN 48.
+vec3 hist(vec2 uv,float age){age=clamp(age,0.,HN-2.);float a0=floor(age);float f=age-a0;
+  float l0=mod(uHead-a0+HN,HN),l1=mod(uHead-a0-1.+HN,HN);
+  return mix(texture(uHist,vec3(uv,l0)).rgb,texture(uHist,vec3(uv,l1)).rgb,f);}
+float perim(vec2 p,vec2 b,float r){
+  vec2 c=b-r;float ar=PI*.5*r;float sy=2.*c.y;float L=4.*c.x+2.*sy+4.*ar;
+  vec2 a=abs(p);float s;
+  if(a.x>c.x&&a.y>c.y){
+    vec2 cc=vec2(sign(p.x)*c.x,sign(p.y)*c.y);float ang=atan(p.y-cc.y,p.x-cc.x);
+    if(p.x>0.&&p.y>0.)s=c.x+r*(PI*.5-ang);
+    else if(p.x>0.)s=c.x+ar+sy-r*ang;
+    else if(p.y<0.)s=3.*c.x+2.*ar+sy+r*(-PI*.5-ang);
+    else s=3.*c.x+3.*ar+2.*sy+r*(PI-ang);
+  }else if(a.x>c.x||(a.y<=c.y&&(b.x-a.x)<(b.y-a.y))){
+    if(p.x>0.)s=c.x+ar+(c.y-p.y);else s=3.*c.x+3.*ar+sy+(p.y+c.y);
+  }else{
+    if(p.y>0.)s=p.x>=0.?p.x:3.*c.x+4.*ar+2.*sy+(p.x+c.x);
+    else s=c.x+2.*ar+sy+(c.x-p.x);
+  }
+  return s/L;
+}
+vec2 perimPoint(float u,vec2 b,float r){
+  vec2 c=b-r;float ar=PI*.5*r;float sx=2.*c.x,sy=2.*c.y;float L=2.*sx+2.*sy+4.*ar;
+  float s=fract(u)*L;
+  if(s<c.x)return vec2(s,b.y);s-=c.x;
+  if(s<ar){float a=PI*.5-s/r;return c+r*vec2(cos(a),sin(a));}s-=ar;
+  if(s<sy)return vec2(b.x,c.y-s);s-=sy;
+  if(s<ar){float a=-s/r;return vec2(c.x,-c.y)+r*vec2(cos(a),sin(a));}s-=ar;
+  if(s<sx)return vec2(c.x-s,-b.y);s-=sx;
+  if(s<ar){float a=-PI*.5-s/r;return vec2(-c.x,-c.y)+r*vec2(cos(a),sin(a));}s-=ar;
+  if(s<sy)return vec2(-b.x,-c.y+s);s-=sy;
+  if(s<ar){float a=PI-s/r;return vec2(-c.x,c.y)+r*vec2(cos(a),sin(a));}s-=ar;
+  return vec2(-c.x+s,b.y);
+}
+`;
+const MAIN = `
+void main(){vec3 c=fx(vUv);fragColor=vec4(clamp(c,0.,1.),clamp(gA,0.,1.));}
+`;
+
+/* ---------- sources ---------- */
+const SOURCES = {
+loop: `
+float sdTri(vec2 p,float r){const float k=1.7320508;p.x=abs(p.x)-r;p.y=p.y+r/k;
+  if(p.x+k*p.y>0.)p=vec2(p.x-k*p.y,-k*p.x-p.y)/2.;p.x-=clamp(p.x,-2.*r,0.);return -length(p)*sign(p.y);}
+vec3 fx(vec2 uv){
+  vec2 A=aspect();vec2 p=(uv-.5)*A;float t=uTime;float k=kick();
+  vec3 col=mix(vec3(.015,.01,.04),vec3(.09,.02,.15),uv.y);
+  float hz=fbm(p*2.+vec2(t*.05,0.));
+  for(int i=0;i<6;i++){
+    float fi=float(i);
+    vec2 o=vec2((fi-2.5)*.34,.6);
+    float ang=sin(t*.55+fi*1.7)*.55;
+    vec2 d=p-o;float a=atan(d.x,-d.y)-ang;
+    float beam=exp(-a*a*140.)*smoothstep(1.5,0.,length(d));
+    vec3 bc=hsv(fract(fi*.17+t*.03),.7,1.);
+    col+=bc*beam*(.3+.7*hz)*(.55+.7*k);
+  }
+  for(int i=0;i<3;i++){
+    float fi=float(i);
+    vec2 q=rot(t*.4*(i==1?-1.:1.)+fi)*p;
+    float s=.16+fi*.075+.03*k;
+    float d=sdTri(q,s);
+    vec3 c=hsv(.55+fi*.15+t*.02,.8,1.);
+    col+=c*(exp(-abs(d)/.0035)*1.3+exp(-abs(d)/.03)*.25);
+  }
+  vec2 g=p*18.+vec2(0.,-t*1.5);vec2 id=floor(g);vec2 f=fract(g)-.5;
+  float hp=h21(id);
+  float star=smoothstep(.07,0.,length(f-(h22(id)-.5)*.6))*step(.86,hp);
+  col+=star*hsv(hp,.4,1.)*(.5+.5*sin(t*3.+hp*30.));
+  return col;
+}`,
+type: `
+vec3 fx(vec2 uv){
+  vec2 A=aspect();vec2 p=(uv-.5)*A;float k=kick();
+  float rows=4.;float yy=uv.y*rows;float row=floor(yy);
+  float dir=mod(row,2.)*2.-1.;float rh=1./rows;
+  float tx=fract(p.x/(rh*4.)+dir*uTime*.1+row*.27);
+  vec2 tp=vec2(tx,fract(yy));
+  float m=texture(uText,tp).r;float mb=textureLod(uText,tp,3.).r;
+  vec3 bg=mix(vec3(.02,.015,.05),vec3(.07,.02,.11),uv.y);
+  vec3 c=hsv(.75+row*.09+uTime*.02,.75,1.);
+  float shine=exp(-abs(fract(uv.x*.5-uTime*.3+row*.2)-.5)*12.)*.8;
+  float o=mod(row,2.)>.5?clamp((mb-m)*3.,0.,1.)+m*.08:m;
+  return bg+c*o*(1.+shine)*(.85+.4*k);
+}`,
+stage: `
+float sdCap(vec2 p,vec2 a,vec2 b,float r){vec2 pa=p-a,ba=b-a;float h=clamp(dot(pa,ba)/dot(ba,ba),0.,1.);return length(pa-ba*h)-r;}
+float smin2(float a,float b,float k){float h=clamp(.5+.5*(b-a)/k,0.,1.);return mix(b,a,h)-k*h*(1.-h);}
+float figure(vec2 q,float raise,out float skin){
+  float head=(length((q-vec2(0.,.17))/vec2(.068,.088))-1.)*.068;
+  float neck=sdCap(q,vec2(0.,.06),vec2(0.,.12),.03);
+  vec2 tq=q-vec2(0.,-.27);tq.x/=1.+clamp(-tq.y,0.,.3)*.25;
+  float torso=sdRB(tq,vec2(.15,.26),.07);
+  vec2 shL=vec2(-.13,0.),shR=vec2(.13,0.);
+  vec2 elL=vec2(-.19,-.17),hdL=vec2(-.16,-.33);
+  vec2 elR=mix(vec2(.19,-.17),vec2(.17,-.08),raise),hdR=mix(vec2(.16,-.33),vec2(.05,.07),raise);
+  float armL=min(sdCap(q,shL,elL,.042),sdCap(q,elL,hdL,.036));
+  float armR=min(sdCap(q,shR,elR,.042),sdCap(q,elR,hdR,.036));
+  float hands=min(length(q-hdL)-.035,length(q-hdR)-.035);
+  float d=smin2(smin2(torso,neck,.03),min(armL,armR),.02);
+  d=min(d,head);
+  skin=min(min(head,neck),hands);
+  return min(d,hands);
+}
+vec3 fx(vec2 uv){
+  vec2 A=aspect();vec2 p=(uv-.5)*A;float t=uTime;float k=kick();
+  vec3 col=mix(vec3(.015,.012,.03),vec3(.05,.03,.09),uv.y);
+  vec2 g=p*7.+vec2(t*.15,0.);vec2 id=floor(g);vec2 f=fract(g)-.5;float h=h21(id);
+  col+=hsv(.55+h*.35+t*.02,.6,1.)*smoothstep(.42,.2,length(f))*.1*(.5+.5*sin(t*1.5+h*20.))*(.7+.6*k);
+  for(int i=0;i<4;i++){float fi=float(i);vec2 o=vec2((fi-1.5)*.45,.62);vec2 d=p-o;float a=atan(d.x,-d.y)-sin(t*.5+fi*1.9)*.4;
+    col+=hsv(fi*.21+.6,.7,1.)*exp(-a*a*90.)*smoothstep(1.4,0.,length(d))*.35*(.6+.6*k);}
+  float raise=smoothstep(.2,.8,.5+.5*sin(uBeats*PI/8.));
+  vec2 q=p-vec2(sin(t*.7)*.025,-.04-.006*k);
+  q=rot(sin(t*.5)*.03)*q;
+  float skin;float d=figure(q,raise,skin);
+  float e=1.5/uRes.y;float s1,s2;
+  vec2 gr=vec2(figure(q+vec2(e,0.),raise,s1)-d,figure(q+vec2(0.,e),raise,s2)-d)/e;
+  float depth=clamp(-d/.05,0.,1.);
+  vec3 n=normalize(vec3(gr*(1.-depth),sqrt(depth)+.15));
+  float key=max(dot(n,normalize(vec3(-.5,.4,.8))),0.);
+  vec3 base=skin<.002?vec3(.78,.52,.42):vec3(.07,.07,.09);
+  if(skin<.002&&q.y>.2-(q.x*q.x)*4.&&length((q-vec2(0.,.17))/vec2(.068,.088))<1.05)base=vec3(.05,.035,.03);
+  vec3 fig=base*(.12+key*1.1);
+  float rim=exp(d/.012)*step(d,0.);
+  fig+=mix(hsv(.85,.7,1.),hsv(.55,.7,1.),step(0.,q.x))*rim*(.8+.6*k);
+  vec2 hdR=mix(vec2(.16,-.33),vec2(.05,.07),raise);
+  float mic=sdCap(q,hdR,hdR+vec2(-.02,.07)*raise+vec2(0.,.05)*(1.-raise),.012);
+  col=mix(col,fig,smoothstep(e,-e,d));
+  col=mix(col,vec3(.03)+vec3(.3)*exp(-abs(mic)/.004),smoothstep(e,-e,mic));
+  float cx=p.x*9.;float ci=floor(cx);float cf=fract(cx)-.5;
+  float hh=-.43+.04*h11(ci)+.012*sin(t*3.+ci)*(.5+k);
+  float crowd=max(step(p.y,hh),smoothstep(.046,.04,length(vec2(cf/9.,p.y-hh))));
+  col=mix(col,vec3(.006,.005,.01),crowd);
+  gA=clamp(max(smoothstep(e,-e,d),smoothstep(e,-e,mic)),0.,1.)*(1.-crowd);
+  vec2 ph=p-vec2((ci+.5)/9.+.025,hh+.075);
+  col+=vec3(.9,.95,1.)*(smoothstep(.008,.004,length(ph))+exp(-length(ph)/.02)*.3)*step(.7,h11(ci*3.1))*step(-.5,p.y);
+  return col;
+}
+`,
+clip: `
+vec3 fx(vec2 uv){
+  vec2 A=aspect();float ca=uClipAspect;vec2 q=uv-.5;
+  if(ca>A.x)q.x*=A.x/ca;else q.y*=ca/A.x;
+  return texture(uClip,q+.5).rgb;
+}`
+};
+const COPY = `vec3 fx(vec2 uv){return texture(uSrc,uv).rgb;}`;
+
+/* ---------- effects ---------- */
+const AURA_LIB = `
+float KEYED=0.;
+float isKeyed(){return step(textureLod(uSrc,vec2(.5),12.).a,.985);}
+float matte(vec2 uv,float lod,float key){vec4 c=textureLod(uSrc,uv,lod);return c.a*mix(smoothstep(key,key+.12,luma(c.rgb)),1.,KEYED);}
+float field(vec2 uv,float key,float reach){
+  vec2 A=aspect();
+  float acc=matte(uv,1.,key);
+  for(int r=1;r<=4;r++){
+    float fr=float(r);
+    float R=fr/4.*mix(.04,.16,reach);
+    float sm=0.;
+    for(int i=0;i<12;i++){float a=float(i)/12.*TAU+fr*.9;sm+=matte(uv+vec2(cos(a),sin(a))*R/A,1.+fr*.9,key);}
+    acc=max(acc,sm/12.*(1.-(fr-1.)*.17));
+  }
+  return acc;
+}
+`;
+const SLICE_LIB = `
+float liqV(float s,float t,float seed,float dens,float dir){
+  float a=TAU*s;
+  a+=.35*sin(a*2.+t*.7+seed)+.2*sin(a*5.-t*1.1+seed*2.);
+  a-=t*dir*.6;
+  vec2 c=vec2(cos(a),sin(a))*mix(1.2,3.5,dens)+vec2(seed*7.3,t*.22);
+  return fbm(c);
+}
+void sliceAt(float fi,float n,float wc,float inset,float rad,vec2 A,inout float x0,out vec2 c,out vec2 b,out float r){
+  bool odd=mod(n,2.)>.5;float tot=n+(odd?wc-1.:0.);
+  float w=(odd&&abs(fi-(n-1.)*.5)<.1)?wc:1.;
+  float sw=A.x*w/tot;c=vec2(x0+sw*.5,0.);x0+=sw;
+  b=vec2(sw*.5-inset,.5-inset);r=max(min(rad,min(b.x,b.y)-.001),.0005);
+}
+`;
+const TRANS_LIB = `
+float SWAP=0.;
+vec4 TA(vec2 uv){return SWAP>.5?texture(uSrc2,uv):texture(uSrc,uv);}
+vec4 TB(vec2 uv){return SWAP>.5?texture(uSrc,uv):texture(uSrc2,uv);}
+vec4 TAl(vec2 uv,float l){return SWAP>.5?textureLod(uSrc2,uv,l):textureLod(uSrc,uv,l);}
+vec4 TBl(vec2 uv,float l){return SWAP>.5?textureLod(uSrc,uv,l):textureLod(uSrc2,uv,l);}
+float tprog(){float dur=exp2(floor(uP0*3.99));float hold=exp2(floor(uP1*3.99));float per=dur+hold;float t=mod(uBeats,per*2.);SWAP=step(per,t);t=mod(t,per);return clamp(t/dur,0.,1.);}
+float ease3(float x){return x<.5?4.*x*x*x:1.-pow(-2.*x+2.,3.)/2.;}
+`;
+const CAUS = `
+float caus(vec2 p,float t){
+  vec2 i=p;float c=1.;float inten=.005;
+  for(int n=0;n<5;n++){float tt=t*(1.-(3.5/float(n+1)));
+    i=p+vec2(cos(tt-i.x)+sin(tt+i.y),sin(tt-i.y)+cos(tt+i.x));
+    c+=1./length(vec2(p.x/(sin(i.x+tt)/inten),p.y/(cos(i.y+tt)/inten)));}
+  c/=5.;c=1.17-pow(c,1.4);return pow(abs(c),8.);
+}
+`;
+const EFFECTS = [
+{ id:'chrome', name:'Chrome Ribbon', cat:'Borders',
+  desc:'A liquid-metal frame that flows and ripples on the beat, with thin-film colour and a soft shadow cast onto your content.',
+  params:[['Width',.55],['Flow',.35],['Iridescence',.4],['Beat ripple',.6],['Inner shadow',.6],['Detail',.4]],
+  glsl:`
+float chromeH(vec2 p,vec2 b,float w,float t,out float ww,out float edge){
+  edge=-sdRB(p,b,0.);
+  float wob=(fbm(p*2.2+vec2(t,-t*.7))-.5)*w*.8;
+  ww=w+wob;
+  float x=clamp(edge/ww,0.,1.);
+  float h=sin(PI*x);
+  h+=(fbm(p*mix(3.,9.,uP5)+vec2(-t*1.3,t))-.5)*.14;
+  h+=kick()*uP3*.18*sin(edge*60.-uTime*10.)*(1.-x);
+  return h*smoothstep(ww,ww-.003,edge);
+}
+vec3 fx(vec2 uv){
+  vec2 A=aspect();vec2 p=(uv-.5)*A;vec2 b=A*.5;
+  float w=mix(.03,.15,uP0);float t=uTime*mix(.03,.5,uP1);float k=kick();
+  float ww,edge,a1,a2,a3,a4;
+  float h=chromeH(p,b,w,t,ww,edge);
+  float e=1.5/uRes.y;
+  float hx=chromeH(p+vec2(e,0.),b,w,t,a1,a2);
+  float hy=chromeH(p+vec2(0.,e),b,w,t,a3,a4);
+  vec3 n=normalize(vec3(-(hx-h)/e*.01,-(hy-h)/e*.01,1.));
+  vec3 r=reflect(vec3(0.,0.,-1.),n);
+  float band=.5+.5*sin(r.x*3.+r.y*4.5+uTime*.5);
+  vec3 env=mix(vec3(.03,.035,.05),vec3(.95,.97,1.),smoothstep(.2,.95,band));
+  env+=vec3(1.)*pow(max(0.,r.y*.8+.4),6.)*.8;
+  float fres=pow(1.-n.z,2.);
+  vec3 film=pal(h*1.3+dot(n.xy,vec2(1.,.6))*2.+uTime*.1);
+  vec3 chrome=mix(env,env*film*1.6,uP2)+fres*.6;
+  float mask=smoothstep(ww+.002,ww-.002,edge);
+  vec3 col=src(uv).rgb;
+  float inner=max(edge-ww,0.);
+  col*=1.-uP4*.75*exp(-inner/.035);
+  col=mix(col,chrome,mask);
+  col+=hsv(.6+uP2*.3,.5,1.)*exp(-abs(edge-ww)/.002)*.35*(1.+k);
+  return col;
+}`},
+
+
+
+
+{ id:'ink', name:'Ink Bloom', cat:'Masks',
+  desc:'An organic ink mask that blooms open and closes again over 1, 2, 4 or 8 beats, with a glowing wet edge.',
+  params:[['Cycle (beats)',.67],['Detail',.45],['Edge',.45],['Ink hue',.9],['Hidden look',.5],['Warp',.5]],
+  glsl:`
+vec3 fx(vec2 uv){
+  vec2 A=aspect();vec2 p=(uv-.5)*A;
+  float cyc=exp2(floor(uP0*3.99));
+  float ph=fract(uBeats/cyc);
+  float th=smoothstep(0.,1.,1.-abs(ph*2.-1.));
+  float sc=mix(1.2,5.,uP1);
+  vec2 w=vec2(fbm(p*sc*.5+uTime*.06),fbm(p*sc*.5+vec2(5.2,1.3)-uTime*.05));
+  float f=fbm(p*sc+(w-.5)*mix(.5,4.,uP5));
+  f=f*.65+(1.-length(p)*1.1)*.35;
+  float m=f-(1.-mix(.08,.88,th));
+  float ew=mix(.008,.07,uP2);
+  float reveal=smoothstep(0.,.004,m);
+  float edge=smoothstep(ew,0.,abs(m));
+  float wet=smoothstep(ew*4.,0.,abs(m))*step(m,0.);
+  vec2 g=vec2(dFdx(m),dFdy(m));
+  vec3 s=src(uv-g/(length(g)+1e-5)*edge*.02).rgb;
+  float l=luma(src(uv).rgb);
+  vec3 duo=mix(hsv(uP3+.5,.8,.04),hsv(uP3+.55,.55,.45),l);
+  vec3 col=mix(duo*uP4,s,reveal);
+  vec3 ink=hsv(uP3+f*.25,.85,1.);
+  return col+ink*edge*1.3+ink*wet*.2;
+}`}
+,
+{ id:'ink-smoke', name:'Ink · Smoke', cat:'Masks', isNew:false,
+  desc:'The clip rises out of darkness through drifting smoke and sinks back, with soft lit wisps along the edge.',
+  params:[['Cycle (beats)',.67],['Detail',.4],['Softness',.45],['Smoke tint',.58],['Hidden glow',.3],['Turbulence',.6]],
+  glsl:`
+vec3 fx(vec2 uv){
+  vec2 A=aspect();vec2 p=(uv-.5)*A;
+  float cyc=exp2(floor(uP0*3.99));
+  float th=smoothstep(0.,1.,1.-abs(fract(uBeats/cyc)*2.-1.));
+  float sc=mix(1.,4.,uP1);
+  vec2 q=p*sc+vec2(0.,-uTime*.25);
+  vec2 w=vec2(fbm(q+uTime*.1),fbm(q+vec2(3.1,7.7)-uTime*.08));
+  float f=fbm(q+(w-.5)*mix(1.,5.,uP5));
+  f=f*.6+(.5-p.y)*.4;
+  float m=f-(1.-mix(.05,1.,th));
+  float soft=mix(.02,.22,uP2);
+  float reveal=smoothstep(-soft,soft,m);
+  float wisp=exp(-abs(m)/(soft*.7))*(.5+.6*fbm(q*3.));
+  vec3 s=src(uv+vec2(0.,wisp*.01)).rgb;
+  vec3 hid=textureLod(uSrc,uv,5.).rgb*.15*uP4;
+  vec3 col=mix(hid,s,reveal);
+  return col+hsv(uP3,.25,1.)*wisp*.35;
+}`},
+{ id:'ink-burn', name:'Ink · Burn', cat:'Masks', isNew:false,
+  desc:'The clip burns away like paper, with a flame front, charred edge, heat shimmer and embers, then reforms.',
+  params:[['Cycle (beats)',.67],['Detail',.5],['Flame width',.5],['Flame hue',.06],['Embers',.6],['Heat haze',.5]],
+  glsl:`
+vec3 fx(vec2 uv){
+  vec2 A=aspect();vec2 p=(uv-.5)*A;float k=kick();
+  float cyc=exp2(floor(uP0*3.99));
+  float th=smoothstep(0.,1.,1.-abs(fract(uBeats/cyc)*2.-1.));
+  float sc=mix(1.5,6.,uP1);
+  float f=fbm(p*sc+vec2(3.,1.))*.55+fbm(p*sc*3.)*.15+(length(p*vec2(.8,1.))*.9)*.3;
+  float m=(1.-mix(.08,.95,th))-f;
+  float fw=mix(.006,.04,uP2);
+  float heat=exp(-max(m,0.)/(fw*3.))*step(0.,m);
+  vec2 hz=(vec2(fbm(p*20.+uTime*2.),fbm(p*20.-uTime*2.))-.5)*.012*uP5*heat;
+  vec3 s=src(uv+hz).rgb;
+  float alive=smoothstep(-.002,.002,m);
+  float flame=exp(-abs(m)/fw);
+  float hot=exp(-abs(m)/(fw*.3));
+  vec3 fire=mix(hsv(uP3,.95,1.),vec3(1.,.92,.6),hot);
+  float charred=smoothstep(0.,fw*2.,-m)*(1.-smoothstep(fw*2.,fw*6.,-m));
+  vec3 burnt=vec3(.015,.01,.008)+vec3(.06,.03,.015)*charred;
+  vec3 col=mix(burnt,s*(1.-flame*.5),alive);
+  col+=fire*flame*(1.3+.6*k);
+  vec2 eg=p*vec2(220.,220.)+vec2(0.,uTime*8.);vec2 eid=floor(eg);vec2 ef=fract(eg)-.5-(h22(eid)-.5)*.5;
+  float em=step(1.-uP4*.06,h21(eid+floor(uTime*6.)))*smoothstep(.25,.05,length(ef))*exp(-max(-m,0.)/(fw*2.5))*(1.-alive);
+  col+=hsv(uP3+.03,.9,1.)*em*2.5;
+  return col;
+}`},
+{ id:'ink-water', name:'Ink · Watercolour', cat:'Masks', isNew:false,
+  desc:'Three pigment drops bloom across the frame with dark rims and paper grain, revealing the clip tinted in their colours. New drops each cycle.',
+  params:[['Cycle (beats)',.67],['Spread',.6],['Edge darkening',.6],['Pigment hue',.55],['Paper',0],['Granulation',.5]],
+  glsl:`
+vec3 fx(vec2 uv){
+  vec2 A=aspect();vec2 p=(uv-.5)*A;
+  float cyc=exp2(floor(uP0*3.99));
+  float cid=floor(uBeats/cyc);
+  float th=smoothstep(0.,1.,1.-abs(fract(uBeats/cyc)*2.-1.));
+  vec3 s=src(uv).rgb;
+  float gr=fbm(p*70.);
+  vec3 paper=mix(vec3(.01,.01,.015),vec3(.96,.94,.9)*(.92+.08*gr),uP4);
+  float reveal=0.;vec3 tint=vec3(1.);float rim=0.;vec3 wash=vec3(0.);
+  for(int j=0;j<3;j++){
+    float fj=float(j);
+    vec2 c=(h22(vec2(cid,fj*4.1))-.5)*A*.7;
+    float R=th*mix(.35,1.05,uP1)*(.75+.5*h11(cid+fj));
+    float fld=R-length(p-c)+(fbm(p*3.+fj*10.+cid)-.5)*.3*th;
+    float a=smoothstep(0.,.008,fld);
+    vec3 pig=hsv(uP3+fj*.12+h11(cid*3.+fj)*.08,.65,1.);
+    tint*=mix(vec3(1.),pig,a*.65);
+    wash+=pig*a*(.06+.1*(1.-uP4))*(.7+.6*fbm(p*8.+fj*3.));
+    rim+=exp(-max(fld,0.)/.02)*a;
+    reveal=max(reveal,a);
+  }
+  vec3 col=mix(paper,s*tint*1.35+wash,reveal);
+  col*=1.-.45*clamp(rim,0.,1.)*uP2;
+  col*=mix(1.,.85+.3*gr,reveal*uP5);
+  return col;
+}`},
+{ id:'typemask', name:'Type Cutout', cat:'Masks',
+  desc:'The clip shows only through a giant word that punches on the beat. Raise Rows to tile it into scrolling lines.',
+  params:[['Scale',.55],['Outside dim',.7],['Motion',.5],['Glow',.6],['Rows',0],['Hue',.8]],
+  glsl:`
+vec3 fx(vec2 uv){
+  vec2 A=aspect();vec2 p=(uv-.5)*A;float k=kick();
+  float sc=mix(.45,1.5,uP0)*(1.+.1*k);
+  vec2 q=rot(sin(uBeats*PI*.25)*.1*uP2)*p/sc;
+  float n=floor(mix(1.,5.,uP4)+.5);
+  float m,mb,echo=0.;
+  if(n<1.5){
+    vec2 tw=vec2(A.x*.92,A.x*.92/4.);
+    vec2 tp=q/tw+.5;
+    float inb=step(0.,tp.x)*step(tp.x,1.)*step(0.,tp.y)*step(tp.y,1.);
+    m=texture(uText,tp).r*inb;mb=textureLod(uText,tp,4.).r*inb;
+    vec2 tp2=q/(1.+uBeat*.7)/tw+.5;
+    float inb2=step(0.,tp2.x)*step(tp2.x,1.)*step(0.,tp2.y)*step(tp2.y,1.);
+    float v=textureLod(uText,tp2,1.).r*inb2;
+    echo=smoothstep(.25,.5,v)*smoothstep(.75,.5,v)*(1.-uBeat);
+  }else{
+    float rh=1./n;float yy=q.y/rh+n*.5;float row=floor(yy);float dir=mod(row,2.)*2.-1.;
+    vec2 tp=vec2(fract(q.x/(rh*4.)+dir*uTime*.12*(.5+uP2)+row*.31),fract(yy));
+    m=texture(uText,tp).r;mb=textureLod(uText,tp,4.).r;
+  }
+  vec3 s=src(uv).rgb;
+  vec3 sIn=src(.5+(uv-.5)*(.92-.06*k)).rgb*1.12;
+  vec3 bl=textureLod(uSrc,uv,4.).rgb;
+  vec3 sOut=mix(s,vec3(luma(bl)),.6)*(1.-uP1);
+  vec3 col=mix(sOut,sIn,m);
+  vec3 gc=hsv(uP5+uTime*.03,.7,1.);
+  col+=gc*clamp(mb*1.6-m,0.,1.)*uP3*1.6*(1.+k);
+  col+=gc*echo*uP3*1.2;
+  return col;
+}`},
+
+
+{ id:'led', name:'LED Wall', cat:'Stylize',
+  desc:'Rebuilds the clip as an LED panel with RGB sub-pixels, bloom and a beat ripple. Crossfade to a rotated halftone.',
+  params:[['Pitch',.45],['Bloom',.5],['Ripple',.7],['LED → halftone',0],['Gap',.4],['Saturation',.3]],
+  glsl:`
+vec3 fx(vec2 uv){
+  vec2 A=aspect();float k=kick();
+  float cells=floor(mix(110.,22.,uP0));
+  vec2 gs=vec2(cells*A.x,cells);
+  vec2 g=uv*gs;vec2 id=floor(g),f=fract(g)-.5;
+  vec2 cuv=(id+.5)/gs;
+  vec3 c=textureLod(uSrc,cuv,2.).rgb;
+  vec2 pc=(cuv-.5)*A;float rd=length(pc);
+  float rip=exp(-abs(rd-uBeat*1.3)*9.)*k*uP2;
+  c=mix(vec3(luma(c)),c,1.+uP5);
+  c=max(c,0.)+rip*.7*hsv(rd*.5+uTime*.1,.6,1.);
+  float rad=mix(.46,.28,uP4)*(1.+rip*.35);
+  float d=length(f);
+  float led=smoothstep(rad,rad-.1,d);
+  vec3 sub=vec3(step(f.x,-.1667),step(-.1667,f.x)*step(f.x,.1667),step(.1667,f.x));
+  vec3 ledc=c*led*mix(vec3(1.),sub*2.2,.45)*1.4+c*exp(-d*5.)*uP1*.5;
+  vec2 hp=rot(.785)*(uv-.5)*A*cells*.8;vec2 hf=fract(hp)-.5;
+  vec3 hcol=textureLod(uSrc,uv,2.).rgb;
+  float hr=sqrt(luma(hcol))*.65*(1.+rip*.5);
+  float ht=smoothstep(hr,hr-.07,length(hf));
+  vec3 htc=mix(vec3(luma(hcol)),hcol,1.+uP5)*ht*1.3;
+  vec3 col=mix(ledc,htc,uP3);
+  return col+textureLod(uSrc,uv,5.).rgb*uP1*.35;
+}`},
+{ id:'contour', name:'Contour', cat:'Stylize',
+  desc:'Topographic lines traced from the clip’s brightness, flowing downhill and cycling through the palette.',
+  params:[['Lines',.45],['Speed',.4],['Width',.3],['Blackout',.6],['Palette',0],['Smoothness',.4]],
+  glsl:`
+vec3 fx(vec2 uv){
+  vec3 s=src(uv).rgb;
+  float h=luma(textureLod(uSrc,uv,mix(0.,4.,uP5)).rgb);
+  h+=.04*fbm(uv*5.+uTime*.1);
+  float n=mix(6.,40.,uP0);
+  float v=h*n-uTime*mix(0.,3.,uP1);
+  float fw=max(fwidth(v),1e-4);
+  float dist=abs(fract(v+.5)-.5);
+  float w=mix(.7,3.,uP2);
+  float line=1.-smoothstep(fw*w*.5,fw*w,dist);
+  float idx=floor(v+.5);
+  float maj=step(mod(idx,5.),.5);
+  vec3 lc=pal(idx*.06+uP4+uTime*.02)*1.25;
+  vec3 bg=mix(s,pal(h+uP4)*h*.25,uP3);
+  return bg+lc*line*(.8+maj*.9)*(1.+kick()*.6);
+}`},
+{ id:'echo', name:'Echo Tunnel', cat:'Feedback',
+  desc:'Every frame is fed back into the next, zoomed, rotated and hue-shifted, for endless trails. Key sets what cuts through.',
+  params:[['Zoom',.55],['Rotate',.62],['Hue drift',.5],['Decay',.65],['Key',.35],['Drift',.4]],
+  glsl:`
+vec3 fx(vec2 uv){
+  vec2 A=aspect();vec2 p=(uv-.5)*A;float k=kick();
+  float z=1.-mix(-.015,.05,uP0)*(1.+k*.8);
+  float ang=(uP1-.5)*.07;
+  vec2 off=vec2(sin(uTime*.7),cos(uTime*.53))*.006*uP5;
+  vec2 q=rot(ang)*p*z+off;
+  vec3 pv=hue(prevf(q/A+.5),uP2*.12)*mix(.82,.985,uP3);
+  vec3 s=src(uv).rgb;
+  return mix(pv,s,smoothstep(uP4,uP4+.08,luma(s)));
+}`}
+,
+{ id:'echo-kaleido', name:'Echo · Kaleido', cat:'Feedback', isNew:false,
+  desc:'Feedback folded through a kaleidoscope, so the trails grow into a living mandala.',
+  params:[['Segments',.35],['Zoom',.5],['Rotate',.6],['Hue drift',.5],['Decay',.6],['Key',.35]],
+  glsl:`
+vec3 fx(vec2 uv){
+  vec2 A=aspect();vec2 p=(uv-.5)*A;float k=kick();
+  float seg=floor(mix(3.,12.,uP0)+.5);
+  float a=atan(p.y,p.x)+uTime*.05;float r=length(p);
+  float sa=TAU/seg;a=mod(a,sa);a=abs(a-sa*.5);
+  vec2 kp=vec2(cos(a),sin(a))*r;
+  float z=1.-mix(-.01,.04,uP1)*(1.+k*.8);
+  vec2 q=rot((uP2-.5)*.06)*kp*z;
+  vec3 pv=hue(prevf(q/A+.5),uP3*.12)*mix(.82,.985,uP4);
+  vec3 sk=src(kp/A+.5).rgb;
+  return mix(pv,sk,smoothstep(uP5,uP5+.08,luma(sk)));
+}`},
+{ id:'echo-vortex', name:'Echo · Vortex', cat:'Feedback', isNew:false,
+  desc:'Trails get pulled into a spinning vortex at the centre, cycling colour with every generation. Kicks tighten the spin.',
+  params:[['Pull',.45],['Twist',.5],['Hue drift',.5],['Decay',.65],['Key',.35],['Core glow',.5]],
+  glsl:`
+vec3 fx(vec2 uv){
+  vec2 A=aspect();vec2 p=(uv-.5)*A;float k=kick();
+  float z=1.+mix(.004,.05,uP0)*(1.+k);
+  float ang=mix(.005,.12,uP1)*(1.+k*.6);
+  vec2 q=rot(ang)*p*z;
+  vec3 pv=hue(prevf(q/A+.5),uP2*.2)*mix(.85,.99,uP3);
+  vec3 s=src(uv).rgb;
+  vec3 col=mix(pv,s,smoothstep(uP4,uP4+.08,luma(s)));
+  return col+hsv(uTime*.1,.6,1.)*exp(-length(p)*22.)*k*uP5;
+}`},
+{ id:'echo-stutter', name:'Echo · Stutter', cat:'Feedback', isNew:false, hist:true,
+  desc:'Beat-quantised freeze-frames: copies of the bright parts are stamped on every 1/2, 1/4 or 1/8 note and trail behind like a multi-exposure photo.',
+  params:[['Rate',.5],['Copies',.7],['Drift',.4],['Persistence',.6],['Tint hue',.6],['Tint amount',.6]],
+  glsl:`
+vec3 fx(vec2 uv){
+  float div=exp2(floor(uP0*2.99)+1.);
+  float ph=fract(uBeats*div);
+  float gap=max(uFPB/div,1.);
+  vec3 s=src(uv).rgb;vec3 col=s;
+  float n=floor(mix(2.,6.,uP1));
+  vec2 drift=vec2(1.,.35)*mix(0.,.012,uP2);
+  for(int j=0;j<6;j++){
+    float fj=float(j);if(fj>=n)break;
+    float age=(ph+fj+1.)*gap;if(age>46.)break;
+    vec3 h=hist(uv-drift*(fj+1.),age);
+    float w=pow(mix(.4,.88,uP3),fj+1.);
+    vec3 tint=mix(vec3(1.),hsv(uP4+fj*.12,.8,1.),uP5);
+    col=max(col,h*tint*w*smoothstep(.12,.3,luma(h)));
+  }
+  return col;
+}`},
+{ id:'melt', name:'Paint Melt', cat:'Feedback',
+  desc:'Feedback pushed through a curl-noise flow field, so the clip smears and swirls like wet paint. Beats stir it harder.',
+  params:[['Flow',.5],['Decay',.7],['Scale',.35],['Inject',.4],['Turbulence',.35],['Colour bleed',.4]],
+  glsl:`
+vec2 curl(vec2 p){float e=.02;float a=fbm(p+vec2(0.,e)),b=fbm(p-vec2(0.,e)),c=fbm(p+vec2(e,0.)),d=fbm(p-vec2(e,0.));return vec2(a-b,-(c-d))/(2.*e);}
+vec3 fx(vec2 uv){
+  vec2 A=aspect();vec2 p=(uv-.5)*A;float k=kick();
+  vec2 v=curl(p*mix(1.,6.,uP2)+uTime*mix(.02,.3,uP4));
+  vec2 q=p-v*mix(.0006,.006,uP0)*(1.+2.*k);
+  vec3 pv=hue(prevf(q/A+.5)*mix(.86,.993,uP1),uP5*.06);
+  vec3 s=src(uv).rgb;
+  float inj=clamp(mix(.02,.35,uP3)*(.5+k)+smoothstep(.55,.95,luma(s))*.4*uP3,0.,1.);
+  return mix(pv,s,inj);
+}`}
+,
+{ id:'melt-drip', name:'Melt · Drip', cat:'Feedback', isNew:false,
+  desc:'Wet paint running down a wall: trails slide downward at uneven speeds with a sideways wobble.',
+  params:[['Flow',.5],['Decay',.7],['Wobble',.4],['Inject',.4],['Drip variance',.6],['Colour bleed',.3]],
+  glsl:`
+vec3 fx(vec2 uv){
+  vec2 A=aspect();vec2 p=(uv-.5)*A;float k=kick();
+  float col_sp=.25+.75*pow(vnoise(vec2(p.x*30.,uTime*.15)),mix(.5,3.,uP4));
+  vec2 v=vec2((fbm(p*4.+uTime*.2)-.5)*mix(.1,1.2,uP2),-1.);
+  vec2 q=p-v*mix(.0004,.004,uP0)*col_sp*(1.+k);
+  vec3 pv=hue(prevf(q/A+.5)*mix(.88,.996,uP1),uP5*.05);
+  vec3 s=src(uv).rgb;
+  float inj=clamp(mix(.02,.3,uP3)*(.5+k)+smoothstep(.5,.9,luma(s))*.5*uP3,0.,1.);
+  return mix(pv,s,inj);
+}`},
+{ id:'melt-marble', name:'Melt · Marble', cat:'Feedback', isNew:false,
+  desc:'Orbiting vortices swirl the trails into marbled paper patterns, with the clip combed in as stripes.',
+  params:[['Swirl',.5],['Decay',.75],['Vortices',.4],['Inject',.55],['Comb density',.4],['Colour bleed',.4]],
+  glsl:`
+vec3 fx(vec2 uv){
+  vec2 A=aspect();vec2 p=(uv-.5)*A;float k=kick();
+  float n=floor(mix(2.,6.,uP2)+.5);
+  vec2 v=vec2(0.);
+  for(int i=0;i<6;i++){
+    float fi=float(i);if(fi>=n)break;
+    float t=uTime*(.1+.05*fi)+fi*2.1;
+    vec2 c=vec2(sin(t)*A.x*.35,cos(t*1.3+fi)*.3);
+    vec2 dv=p-c;
+    v+=vec2(-dv.y,dv.x)/(dot(dv,dv)+.02)*(mod(fi,2.)<.5?1.:-1.);
+  }
+  vec2 q=p-v*mix(.0003,.003,uP0)*(1.+k);
+  vec3 pv=hue(prevf(q/A+.5)*mix(.93,.998,uP1),uP5*.04);
+  vec3 s=src(uv).rgb;
+  float comb=smoothstep(.6,.9,.5+.5*sin(p.x*mix(15.,90.,uP4)+uTime));
+  float inj=clamp(mix(.02,.35,uP3)*(.25+k)*comb+smoothstep(.35,.8,luma(s))*.6*uP3,0.,1.);
+  return mix(pv,s,inj);
+}`},
+{ id:'melt-inferno', name:'Melt · Inferno', cat:'Feedback', isNew:false,
+  desc:'The clip feeds a fire: heat rises through curling turbulence and cools from white to yellow to red to black.',
+  params:[['Rise',.5],['Cooling',.5],['Turbulence',.4],['Fuel',.5],['Flame hue',0],['Clip mix',.25]],
+  glsl:`
+vec2 curl(vec2 p){float e=.02;float a=fbm(p+vec2(0.,e)),b=fbm(p-vec2(0.,e)),c=fbm(p+vec2(e,0.)),d=fbm(p-vec2(e,0.));return vec2(a-b,-(c-d))/(2.*e);}
+vec3 firep(float h){vec3 c=clamp(vec3(h*2.6,h*2.6-.95,h*2.6-1.9),0.,1.);return hue(c,uP4*TAU);}
+vec3 fx(vec2 uv){
+  vec2 A=aspect();vec2 p=(uv-.5)*A;float k=kick();
+  vec2 v=curl(p*mix(2.,7.,uP2)+vec2(0.,-uTime*.6))*.6+vec2(0.,1.6);
+  vec2 q=p-v*mix(.001,.006,uP0)*(1.+k*.5);
+  vec3 pv=prevf(q/A+.5);
+  float h=max(luma(hue(pv,-uP4*TAU))*mix(.94,.985,1.-uP1)-.006,0.);
+  vec3 s=src(uv).rgb;
+  h=max(h,smoothstep(.15,.9,luma(s))*mix(.35,.95,uP3)*(.75+.35*k));
+  return mix(firep(h),max(firep(h),s),uP5);
+}`},
+{ id:'marquee', name:'Bulb Marquee', cat:'Borders', isNew:false,
+  desc:'A theatre marquee of light bulbs around the frame. The chase pattern changes every bar: run, blink, opposing comets, sparkle.',
+  params:[['Inset',.35],['Bulbs',.4],['Glow',.6],['Chase speed',.35],['Warm → rainbow',.25],['Housing',.8]],
+  glsl:`
+vec3 fx(vec2 uv){
+  vec2 A=aspect();vec2 p=(uv-.5)*A;float k=kick();
+  float inset=mix(.03,.1,uP0);float rad=.05;
+  vec2 b=vec2(A.x*.5-inset,.5-inset);
+  float d=sdRB(p,b,rad);float s=perim(p,b,rad);
+  float L=4.*(b.x-rad)+4.*(b.y-rad)+TAU*rad;
+  float N=floor(mix(40.,140.,uP1)*.5)*2.;
+  float fi=s*N;float idx=floor(fi+.5);float ds=(fi-idx)/N*L;
+  float bd=length(vec2(ds,d));
+  float br=L/N*.3;
+  float pat=mod(floor(uBeats/4.),4.);
+  float t=uBeats*mix(1.,4.,uP3);
+  float on;
+  if(pat<.5)on=step(.5,fract((idx-t*2.)/4.));
+  else if(pat<1.5)on=mod(idx+floor(t),2.);
+  else if(pat<2.5){float c=fract(t*.125);on=step(abs(fract(idx/N-c+.5)-.5),.06)+step(abs(fract(-idx/N-c+.5)-.5),.06);}
+  else on=step(.55,h11(idx*1.31+floor(t*2.)*13.));
+  on=clamp(on,0.,1.);
+  float lvl=mix(.1,1.,on)*(1.+.6*k);
+  vec3 bc=mix(vec3(1.,.74,.38),hsv(idx/N+uTime*.05,.75,1.),uP4);
+  vec3 col=src(uv).rgb;
+  float band=smoothstep(br*2.6,br*2.1,abs(d));
+  col=mix(col,vec3(.03,.02,.025)+vec3(.08,.06,.04)*(1.-abs(d)/(br*2.6)),band*uP5);
+  float bulb=smoothstep(br,br*.55,bd);
+  float glow=(exp(-bd/(br*1.6))*.8+exp(-bd/(br*3.5))*.25)*exp(-max(abs(d)-br,0.)/.02);
+  col+=bc*(bulb*lvl*1.4+glow*lvl*mix(.25,1.3,uP2));
+  col+=vec3(1.)*smoothstep(br*.35,0.,bd)*lvl*.7;
+  return col;
+}`},
+
+{ id:'caustics', name:'Caustics', cat:'Overlays', isNew:false,
+  desc:'Underwater light caustics dance across the clip and bend it, like the whole stage is at the bottom of a pool.',
+  params:[['Scale',.35],['Speed',.4],['Intensity',.6],['Refraction',.5],['Tint',.5],['Deep water',.5]],
+  glsl:`
+float caus(vec2 p,float t){
+  vec2 i=p;float c=1.;float inten=.005;
+  for(int n=0;n<5;n++){float tt=t*(1.-(3.5/float(n+1)));
+    i=p+vec2(cos(tt-i.x)+sin(tt+i.y),sin(tt-i.y)+cos(tt+i.x));
+    c+=1./length(vec2(p.x/(sin(i.x+tt)/inten),p.y/(cos(i.y+tt)/inten)));}
+  c/=5.;c=1.17-pow(c,1.4);return pow(abs(c),8.);
+}
+vec3 fx(vec2 uv){
+  vec2 A=aspect();vec2 p=(uv-.5)*A;float k=kick();
+  float sc=mix(2.,8.,uP0);float t=uTime*mix(.1,1.,uP1)+10.;
+  vec2 q=p*sc-250.;
+  float c=caus(q,t);
+  vec2 g=vec2(caus(q+vec2(.02,0.),t)-c,caus(q+vec2(0.,.02),t)-c);
+  vec3 s=src(uv+clamp(g,-2.,2.)*mix(0.,.02,uP3)).rgb;
+  vec3 deep=mix(vec3(1.),vec3(.45,.8,1.),uP5);
+  vec3 col=s*deep*(.7+.3*clamp(c,0.,1.));
+  col+=hsv(uP4,.3,1.)*clamp(c*1.1,0.,1.4)*mix(.1,1.,uP2)*(.8+.6*k);
+  return col;
+}`}
+,
+{ id:'caus-rays', name:'Caustics · God Rays', cat:'Overlays', isNew:false,
+  desc:'Deep-water look: caustics on the clip, slanted light shafts falling from the surface and drifting particles.',
+  params:[['Scale',.35],['Speed',.35],['Caustic strength',.5],['Ray strength',.6],['Particles',.5],['Deep water',.6]],
+  glsl: CAUS + `
+vec3 fx(vec2 uv){
+  vec2 A=aspect();vec2 p=(uv-.5)*A;float k=kick();
+  float sc=mix(2.,8.,uP0);float t=uTime*mix(.1,1.,uP1)+10.;
+  float c=caus(p*sc-250.,t);
+  vec3 s=src(uv).rgb;
+  vec3 water=mix(vec3(1.),vec3(.3,.68,1.),uP5);
+  vec3 col=s*water*(.65+.35*clamp(c,0.,1.));
+  col+=vec3(.7,.9,1.)*clamp(c,0.,1.2)*.4*uP2;
+  float rx=p.x+p.y*.35;
+  float ray=0.;
+  for(int i=0;i<3;i++){float fi=float(i);ray+=pow(vnoise(vec2(rx*mix(4.,10.,fi*.5)+t*.25*(fi+1.),fi*7.)),3.)*(1.-fi*.25);}
+  ray*=smoothstep(-.7,.5,p.y);
+  col+=vec3(.72,.9,1.)*ray*uP3*(.8+.5*k);
+  vec2 g=p*14.+vec2(sin(uTime*.2)*.5,uTime*.22);
+  vec2 id=floor(g);vec2 f=fract(g)-.5;float h=h21(id);
+  float dust=smoothstep(.06,0.,length(f-(h22(id)-.5)*.7))*step(.8,h);
+  col+=vec3(.8,.95,1.)*dust*uP4*(.5+.5*sin(uTime*2.+h*30.));
+  return col;
+}`},
+{ id:'caus-prism', name:'Caustics · Prism', cat:'Overlays', isNew:false,
+  desc:'Caustics split into red, green and blue so every light line carries a rainbow fringe, over a darkened, refracted clip.',
+  params:[['Scale',.35],['Speed',.35],['Intensity',.6],['Dispersion',.6],['Darken clip',.45],['Refraction',.5]],
+  glsl: CAUS + `
+vec3 fx(vec2 uv){
+  vec2 A=aspect();vec2 p=(uv-.5)*A;float k=kick();
+  float sc=mix(2.,8.,uP0);float t=uTime*mix(.1,1.,uP1)+10.;
+  vec2 q=p*sc-250.;
+  float ds=mix(.0,.06,uP3);
+  float cr=caus(q,t),cg=caus(q*(1.+ds*.5)+vec2(ds*2.,0.),t),cb=caus(q*(1.+ds)+vec2(ds*4.,0.),t);
+  vec2 g=vec2(caus(q+vec2(.02,0.),t)-cr,caus(q+vec2(0.,.02),t)-cr);
+  vec3 s=src(uv+clamp(g,-2.,2.)*mix(0.,.02,uP5)).rgb*mix(1.,.3,uP4);
+  vec3 cc=clamp(vec3(cr,cg,cb)*1.1,0.,1.5);
+  return s+cc*mix(.15,1.2,uP2)*(.8+.6*k);
+}`},
+{ id:'caus-rain', name:'Caustics · Raindrops', cat:'Overlays', isNew:false,
+  desc:'Drops land on the beat and send rippling rings across the clip, bending it and catching highlights, over a faint caustic floor.',
+  params:[['Drops per beat',.0],['Ripple speed',.45],['Persistence',.5],['Refraction',.6],['Highlight',.6],['Caustic floor',.3]],
+  glsl: CAUS + `
+vec3 fx(vec2 uv){
+  vec2 A=aspect();vec2 p=(uv-.5)*A;
+  float rate=exp2(floor(uP0*2.99));
+  float bt=uBeats*rate;
+  vec2 disp=vec2(0.);float hi=0.;
+  for(int i=0;i<8;i++){
+    float fi=float(i);
+    float id=floor(bt)-fi;
+    float age=(bt-id)/rate;
+    vec2 c=(h22(vec2(id,3.7))-.5)*A*.85;
+    vec2 dv=p-c;float r=length(dv)+1e-4;
+    float w=r-age*mix(.2,.7,uP1);
+    float env=exp(-age*mix(1.6,.35,uP2))*smoothstep(0.,.03,age);
+    float pk=exp(-w*w*180.);
+    float wave=sin(w*120.)*pk*env;
+    disp+=dv/r*wave;
+    hi+=max(cos(w*120.),0.)*pk*env;
+  }
+  vec3 col=src(uv+disp*mix(0.,.035,uP3)/A).rgb;
+  col+=vec3(.85,.95,1.)*pow(hi,1.5)*uP4*1.1;
+  float c=caus(p*4.-250.,uTime*.4+10.);
+  col+=vec3(.7,.9,1.)*clamp(c,0.,1.)*uP5*.35;
+  return col;
+}`},
+
+
+{ id:'flipgrid', name:'Flip Grid', cat:'Masks', isNew:false,
+  desc:'The frame splits into tiles that flip over in a 3D wave every bar, revealing a hue-shifted back side. The wave origin alternates.',
+  params:[['Tiles',.3],['Flip speed',.6],['Stagger',.6],['Back look',.8],['Gap',.3],['Perspective',.6]],
+  glsl:`
+vec3 fx(vec2 uv){
+  vec2 A=aspect();vec2 p=(uv-.5)*A;
+  float ny=floor(mix(2.,10.,uP0)+.5);float cs=1./ny;
+  vec2 cell=floor(p/cs);vec2 cc=(cell+.5)*cs;
+  vec2 lp=(p-cc)/(cs*.5);
+  float bar=floor(uBeats/4.);
+  float dist=mod(bar,2.)<.5?length(cc)/(A.x*.6):(cc.x/A.x+.5);
+  float dur=mix(1.,.3,uP1);
+  float prog=clamp((fract(uBeats/4.)*4.-dist*mix(0.,2.,uP2))/dur,0.,1.);
+  float e=prog*prog*(3.-2.*prog)+sin(prog*PI)*.08;
+  float th=PI*(bar+e);float cth=cos(th),sth=sin(th);
+  float ps=mix(0.,.6,uP5);
+  float den=cth-lp.x*sth*ps;
+  float x=lp.x/den;float y=lp.y*(1.+x*sth*ps);
+  vec3 bg=vec3(.01,.01,.02)+textureLod(uSrc,uv,5.).rgb*.12;
+  float lim=1.-mix(0.,.15,uP4);
+  if(abs(den)<1e-3||abs(x)>lim||abs(y)>lim)return bg;
+  bool backF=cth<0.;
+  float xf=backF?-x:x;
+  vec3 c=src((cc+vec2(xf,y)*cs*.5)/A+.5).rgb;
+  if(backF)c=mix(c,hue(c,PI*.8)*1.15,uP3);
+  c*=.5+.5*abs(cth);
+  c+=vec3(.5)*pow(1.-abs(cth),4.)*(.5+.5*x);
+  c*=mix(1.,.6,smoothstep(lim-.03,lim,max(abs(x),abs(y))));
+  return c;
+}`},
+{ id:'disintegrate', name:'Disintegrate', cat:'Masks', isNew:false,
+  desc:'The clip crumbles into glowing particles that blow away on the wind, then reassembles, over 2 to 16 beats.',
+  params:[['Cycle (beats)',.5],['Grain size',.35],['Drift',.7],['Ember glow',.6],['Turbulence',.5],['Ember hue',.06]],
+  glsl:`
+vec3 fx(vec2 uv){
+  vec2 A=aspect();vec2 p=uv*A;
+  float cyc=exp2(floor(uP0*3.99)+1.);
+  float ph=fract(uBeats/cyc);
+  float tri=smoothstep(0.,1.,1.-abs(ph*2.-1.));
+  float cs=mix(3.,12.,uP1)/uRes.y;
+  vec2 dir=normalize(vec2(1.,.45));
+  float front=mix(-.4,A.x+.5,tri);
+  float maxD=40.*cs*mix(.3,1.,uP2);
+  vec3 col=vec3(0.);float best=0.;
+  for(int k=0;k<44;k++){
+    vec2 q=p-dir*float(k)*cs;
+    vec2 c=floor(q/cs);vec2 cc=(c+.5)*cs;
+    float r=h21(c);
+    float fr=front-(fbm(vec2(cc.y*3.,uTime*.15))-.5)*.8*uP4;
+    float act=clamp((fr-cc.x)*mix(1.2,3.,r),0.,1.);
+    act*=act;
+    vec2 pos=cc+dir*act*maxD*(.35+.65*r);
+    vec2 dd=abs(p-pos);
+    float size=cs*.5*(1.-act*.45);
+    if(dd.x<size&&dd.y<size){
+      float alpha=1.-smoothstep(.45,1.,act);
+      if(alpha>best){
+        best=alpha;
+        vec3 sc=src(cc/A).rgb;
+        vec3 ember=hsv(uP5+r*.08,.85,1.);
+        col=(sc*(1.+act*uP3*2.)+ember*smoothstep(0.,.3,act)*uP3*1.2)*alpha;
+      }
+      if(best>.99)break;
+    }
+  }
+  return col;
+}`},
+
+
+
+{ id:'edgeneon', name:'Edge Neon', cat:'Stylize', isNew:false,
+  desc:'Traces every outline in the clip as glowing neon tubing, coloured by edge direction, over a dimmed or black background.',
+  params:[['Threshold',.35],['Glow',.45],['Background',.12],['Hue',.55],['Hue spread',.6],['Thickness',.3]],
+  glsl:`
+vec2 sobel(vec2 uv,float lod,vec2 px){
+  float a=luma(textureLod(uSrc,uv+px*vec2(-1.,1.),lod).rgb),b=luma(textureLod(uSrc,uv+px*vec2(0.,1.),lod).rgb),c=luma(textureLod(uSrc,uv+px*vec2(1.,1.),lod).rgb);
+  float d=luma(textureLod(uSrc,uv+px*vec2(-1.,0.),lod).rgb),f=luma(textureLod(uSrc,uv+px*vec2(1.,0.),lod).rgb);
+  float g=luma(textureLod(uSrc,uv+px*vec2(-1.,-1.),lod).rgb),h=luma(textureLod(uSrc,uv+px*vec2(0.,-1.),lod).rgb),i=luma(textureLod(uSrc,uv+px*vec2(1.,-1.),lod).rgb);
+  return vec2(c+2.*f+i-a-2.*d-g,a+2.*b+c-g-2.*h-i);
+}
+vec3 fx(vec2 uv){
+  vec2 px=mix(1.,3.,uP5)/uRes;float k=kick();
+  vec2 g0=sobel(uv,.5,px);vec2 g1=sobel(uv,2.5,px*4.);vec2 g2=sobel(uv,4.,px*12.);
+  float th=mix(.03,.5,uP0);
+  float e0=smoothstep(th,th*2.+.05,length(g0));
+  float e1=smoothstep(th*.4,th*2.,length(g1));
+  float e2=smoothstep(th*.25,th*1.5,length(g2));
+  vec3 c0=hsv(uP3+atan(g0.y,g0.x)/TAU*uP4+uv.y*.2*uP4+uTime*.05,.8,1.);
+  vec3 c1=hsv(uP3+atan(g1.y,g1.x)/TAU*uP4+uv.y*.2*uP4+uTime*.05,.75,1.);
+  vec3 bg=src(uv).rgb*uP2;
+  float s1=clamp(length(g1)*1.5,0.,1.);
+  return bg+(c0*e0*1.3+vec3(1.)*e0*.3+c1*(e1*.22+e2*.1)*s1*uP1*2.)*(.85+.5*k);
+}`},
+{ id:'ascii', name:'ASCII', cat:'Stylize', isNew:false,
+  desc:'Rebuilds the clip from text characters by brightness, with glyph flicker and a beat wave rolling down the screen.',
+  params:[['Cell size',.35],['Source → mono',0],['Contrast',.5],['Flicker',.4],['Mono hue',.38],['Background',.2]],
+  glsl:`
+vec3 fx(vec2 uv){
+  vec2 A=aspect();float k=kick();
+  float rows=floor(mix(90.,24.,uP0));
+  vec2 cs=vec2(.6/(rows*A.x),1./rows);
+  vec2 id=floor(uv/cs);vec2 f=fract(uv/cs);
+  vec2 cuv=(id+.5)*cs;
+  vec3 c=textureLod(uSrc,cuv,2.).rgb;
+  float l=luma(c);
+  l=pow(clamp(l*mix(1.,2.5,uP2),0.,1.),mix(1.,.6,uP2));
+  float wave=exp(-abs(cuv.y-(1.-uBeat))*12.)*k*.5;
+  float fl=step(1.-uP3*.15,h21(id+floor(uTime*12.)));
+  float gi=floor(clamp(l+wave+fl*.35,0.,1.)*15.99);
+  float gly=texture(uGlyph,vec2((gi+clamp(f.x,.02,.98))/16.,f.y)).r;
+  vec3 gc=mix(c*1.5+.04,hsv(uP4,.75,1.)*(.35+.9*l),uP1);
+  return c*uP5*.3+gc*gly*(1.+wave);
+}`},
+{ id:'ruttetra', name:'Rutt-Etra', cat:'Stylize', isNew:false,
+  desc:'The classic analogue video-synth look: scanlines lifted into 3D by brightness, tilted like a landscape.',
+  params:[['Lines',.4],['Height',.5],['Thickness',.35],['Tilt',.55],['Source → neon',.35],['Glow',.5]],
+  glsl:`
+vec3 fx(vec2 uv){
+  vec2 A=aspect();vec2 p=(uv-.5)*A;
+  float tilt=mix(0.,.9,uP3);
+  float zf=1./max(1.+p.y*tilt*.8,.2);
+  vec2 q=vec2(p.x*zf,p.y*zf*(1.+tilt*.3));
+  float nl=floor(mix(40.,160.,uP0));float sp=1./nl;
+  float amp=mix(.02,.25,uP1)*(1.+.3*kick());
+  float px=1.2/uRes.y*zf;
+  float thick=px*mix(.6,2.5,uP2);
+  vec3 col=vec3(0.);
+  float base=floor((q.y+.5)/sp);
+  float K=min(amp/sp+2.,40.);
+  for(int i=-1;i<42;i++){
+    if(float(i)>K)break;
+    float li=base-float(i);
+    float y0=li*sp-.5;
+    vec2 suv=vec2(q.x/A.x+.5,y0+.5);
+    if(suv.y<0.||suv.y>1.||suv.x<0.||suv.x>1.)continue;
+    vec3 c=textureLod(uSrc,suv,1.).rgb;float l=luma(c);
+    float d=abs(q.y-(y0+l*amp));
+    float ln=smoothstep(thick,0.,d)+exp(-d/(thick*4.))*uP5*.6;
+    vec3 lc=mix(c*1.6+.04,hsv(.5+uTime*.02+l*.3,.6,1.)*(.3+l),uP4);
+    col=max(col,lc*ln*(.3+l));
+  }
+  return col;
+}`},
+{ id:'opart', name:'Op-Art', cat:'Stylize', isNew:false,
+  desc:'Bold black-and-white line fields bent by the clip’s brightness, with moiré interference and a beat pulse rippling outward.',
+  params:[['Density',.45],['Warp',.6],['Moiré',.6],['Pulse',.6],['Ink colour',0],['Paper from clip',0]],
+  glsl:`
+vec3 fx(vec2 uv){
+  vec2 A=aspect();vec2 p=(uv-.5)*A;float k=kick();
+  float l=luma(textureLod(uSrc,uv,2.).rgb);
+  float dens=mix(30.,140.,uP0);
+  float f1=p.y*dens+l*mix(0.,.08,uP1)*dens*3.+sin(p.x*6.+uTime)*mix(0.,3.,uP2);
+  float f2=length(p)*dens*.9-uTime*2.-k*uP3*6.;
+  float fw1=fwidth(f1)*PI+1e-4,fw2=fwidth(f2)*PI+1e-4;
+  float b1=smoothstep(-fw1,fw1,sin(f1*PI));
+  float b2=smoothstep(-fw2,fw2,sin(f2*PI));
+  float m=mix(b1,b1*b2+(1.-b1)*(1.-b2),uP2);
+  vec3 ink=uP4<.01?vec3(.02):hsv(uP4,.85,.55);
+  vec3 paper=mix(vec3(.95,.94,.92),src(uv).rgb*1.2+.05,uP5);
+  return mix(ink,paper,m);
+}`},
+{ id:'slitscan', name:'Slit Scan', cat:'Time', isNew:false, hist:true,
+  desc:'Each slice of the frame shows a different moment in the last second, so motion stretches and bends through time.',
+  params:[['Mode',.0],['Depth',.8],['Reverse',0],['Mix',1],['Wave',.3]],
+  glsl:`
+vec3 fx(vec2 uv){
+  vec2 A=aspect();vec2 p=(uv-.5)*A;
+  float mode=floor(uP0*3.99);
+  float f;
+  if(mode<.5)f=uv.x;else if(mode<1.5)f=uv.y;else if(mode<2.5)f=clamp(length(p)/(A.x*.5),0.,1.);else f=fbm(p*2.+uTime*.1);
+  if(uP2>.5)f=1.-f;
+  f+=sin(f*TAU*2.+uTime*1.5)*.08*uP4;
+  vec3 col=hist(uv,clamp(f,0.,1.)*mix(4.,47.,uP1));
+  return mix(src(uv).rgb,col,uP3);
+}`},
+{ id:'timesplit', name:'RGB Time Split', cat:'Time', isNew:false, hist:true,
+  desc:'Red, green and blue each lag by a different number of frames, so anything moving tears into colour ghosts. Beats stretch the gap.',
+  params:[['Red delay',0],['Green delay',.25],['Blue delay',.5],['Beat pump',.5],['Echo trails',.35],['Saturation',.3]],
+  glsl:`
+vec3 fx(vec2 uv){
+  float pump=1.+uP3*kick()*1.5;
+  vec3 col=vec3(hist(uv,uP0*30.*pump).r,hist(uv,uP1*30.*pump).g,hist(uv,uP2*30.*pump).b);
+  vec3 e=vec3(0.);
+  for(int i=1;i<=4;i++){float fi=float(i);e=max(e,hist(uv,fi*9.)*hsv(fi*.2+uTime*.05,.7,1.)*(1.-fi*.2));}
+  col=max(col,e*uP4);
+  return mix(vec3(luma(col)),col,1.+uP5);
+}`},
+{ id:'timetiles', name:'Time Tiles', cat:'Time', isNew:false, hist:true,
+  desc:'Datamosh-style tiles, each replaying a different moment from the frame buffer, reshuffled on the beat.',
+  params:[['Tiles',.4],['Max delay',.7],['Amount',.7],['Split depth',.6],['Borders',.5],['Shuffle rate',.3]],
+  glsl:`
+vec3 fx(vec2 uv){
+  vec2 A=aspect();
+  float rate=exp2(floor(uP5*2.99));
+  float shuffle=floor(uBeats*rate);float ph=fract(uBeats*rate);
+  float base=floor(mix(3.,10.,uP0));
+  vec2 g=vec2(floor(base*A.x),base);
+  vec2 c=floor(uv*g);
+  float depth=floor(uP3*3.99);
+  for(int i=0;i<3;i++){if(float(i)>=depth)break;if(h21(c+shuffle*.37+float(i)*9.1)>.5){g*=2.;c=floor(uv*g);}}
+  vec2 f=fract(uv*g);
+  float r=h21(c+shuffle*1.13);
+  float on=step(1.-uP2,r);
+  float age=on*floor(1.+h21(c*1.7+shuffle)*mix(4.,46.,uP1));
+  vec3 col=hist(uv,age);
+  col+=vec3(.25)*exp(-ph*10.)*on;
+  float b=min(min(f.x,1.-f.x)*uRes.x/g.x,min(f.y,1.-f.y)*uRes.y/g.y);
+  return mix(col,vec3(0.),smoothstep(1.6,.4,b)*uP4);
+}`}
+,
+{ id:'type-carousel', name:'Type · Carousel', cat:'Type', isNew:false,
+  desc:'The scrolling word rows from the Kinetic type source, now as an effect: alternating directions, outline rows, a light sweep, and optional beat-snapped motion. Change the word in Word.',
+  params:[['Rows',.35],['Speed',.3],['Beat snap',0],['Outline rows',1],['Hue',.75],['Clip fill',0],['Background',.25],['Shine',.6]],
+  glsl:`
+vec3 fx(vec2 uv){
+  vec2 A=aspect();vec2 p=(uv-.5)*A;float k=kick();
+  float rows=floor(mix(2.,8.,uP0)+.5);
+  float yy=uv.y*rows;float row=floor(yy);float dir=mod(row,2.)*2.-1.;
+  float rh=1./rows;
+  float bt=mix(uBeats,floor(uBeats)+smoothstep(0.,.35,fract(uBeats)),uP2);
+  vec2 tc=vec2(p.x/(rh*4.)+dir*bt*mix(.03,.5,uP1)+row*.27,yy);
+  vec2 tp=vec2(fract(tc.x),fract(tc.y));
+  float m=textureGrad(uText,tp,dFdx(tc),dFdy(tc)).r;
+  float mb=textureLod(uText,tp,3.).r;
+  float o=(mod(row,2.)>.5&&uP3>.5)?clamp((mb-m)*3.,0.,1.)+m*.06:m;
+  vec3 s=src(uv).rgb;
+  vec3 c=hsv(uP4+row*.09+uTime*.02,.75,1.);
+  vec3 fillc=mix(c,s*1.3+.05,uP5);
+  float shine=exp(-abs(fract(uv.x*.5-uTime*.3+row*.2)-.5)*12.)*uP7;
+  return s*uP6*(1.-o)+fillc*o*(1.+shine)*(.85+.4*k);
+}`},
+{ id:'type-wave', name:'Type · Wave', cat:'Type', isNew:false,
+  desc:'Word rows ride a travelling sine wave while they scroll, like a flag in the wind. Kicks make the wave surge.',
+  params:[['Rows',.3],['Wave speed',.4],['Amplitude',.5],['Frequency',.4],['Hue',.55],['Clip fill',0],['Background',.25],['Scroll',.3]],
+  glsl:`
+vec3 fx(vec2 uv){
+  vec2 A=aspect();vec2 p=(uv-.5)*A;float k=kick();
+  float rows=floor(mix(1.,6.,uP0)+.5);float rh=1./rows;
+  float w=sin(p.x*mix(2.,12.,uP3)-uTime*mix(.5,5.,uP1))*mix(0.,.35,uP2)*rh*(1.+k*.6);
+  float yy=(uv.y+w)*rows;float row=floor(yy);float dir=mod(row,2.)*2.-1.;
+  vec2 tc=vec2(p.x/(rh*4.)+dir*uTime*mix(0.,.4,uP7)+row*.31,yy);
+  vec2 tp=vec2(fract(tc.x),fract(tc.y));
+  float m=textureGrad(uText,tp,dFdx(tc),dFdy(tc)).r;
+  float glow=textureLod(uText,tp,4.).r;
+  vec3 s=src(uv).rgb;
+  vec3 c=hsv(uP4+p.x*.15+row*.07+uTime*.03,.8,1.);
+  vec3 fillc=mix(c,s*1.3+.05,uP5);
+  vec3 col=s*uP6*(1.-m)+fillc*m*(.9+.4*k);
+  return col+c*clamp(glow*1.4-m,0.,1.)*.35;
+}`},
+{ id:'type-cylinder', name:'Type · Cylinder', cat:'Type', isNew:false,
+  desc:'The word wrapped around spinning 3D drums, a literal carousel. You see the back of the drum through the gaps.',
+  params:[['Drums',.35],['Speed',.35],['Radius',.75],['Repeats',.7],['Hue',.85],['Clip fill',0],['Background',.2],['Beat snap',.5]],
+  glsl:`
+vec3 fx(vec2 uv){
+  vec2 A=aspect();vec2 p=(uv-.5)*A;float k=kick();
+  float rows=floor(mix(1.,4.,uP0)+.5);float rh=1./rows;
+  float yy=uv.y*rows;float row=floor(yy);float fy=fract(yy);
+  float dir=mod(row,2.)*2.-1.;
+  float R=A.x*.46*mix(.55,1.,uP2);
+  float x=p.x/R;
+  vec3 s=src(uv).rgb;
+  vec3 col=s*uP6;
+  if(abs(x)>=.999)return col;
+  float th=asin(x);
+  float bt=mix(uBeats,floor(uBeats)+smoothstep(0.,.4,fract(uBeats)),uP7);
+  float rotn=dir*bt*mix(.02,.25,uP1);
+  float rep=floor(mix(1.,4.,uP3)+.5);
+  float wordH=(TAU*R/rep)/4.;
+  float ty=(fy-.5)*rh/min(wordH,rh*.9)+.5;
+  if(ty<0.||ty>1.)return col;
+  float uF=fract((th/TAU+rotn)*rep);
+  float uB=fract(((PI-th)/TAU+rotn)*rep);
+  float mF=textureLod(uText,vec2(uF,ty),1.).r;
+  float mB=textureLod(uText,vec2(1.-uB,ty),1.5).r;
+  float shF=.3+.7*sqrt(max(cos(th),0.));
+  vec3 c=hsv(uP4+row*.12+uTime*.02,.75,1.);
+  vec3 fillc=mix(c,s*1.3+.05,uP5);
+  col=mix(col,c*.35,mB*.55*(1.-mF));
+  col=mix(col,fillc*shF*(1.+.4*k),mF);
+  col+=vec3(1.)*pow(max(cos(th-.5),0.),40.)*mF*.5;
+  return col;
+}`},
+{ id:'type-slam', name:'Type · Slam', cat:'Type', isNew:false,
+  desc:'On every beat a row slams in from alternating sides with overshoot, motion blur and a flash, building a stack.',
+  params:[['Rows',.35],['Slam time',.35],['Overshoot',.5],['Motion blur',.6],['Hue',.95],['Clip fill',0],['Background',.25],['Flash',.6]],
+  glsl:`
+vec3 fx(vec2 uv){
+  vec2 A=aspect();vec2 p=(uv-.5)*A;
+  float N=floor(mix(2.,6.,uP0)+.5);float rh=1./N;
+  float yy=uv.y*N;float row=floor(yy);float fy=fract(yy);
+  float b=floor(uBeats);
+  float last=b-mod(b-row,N);
+  float age=uBeats-last;
+  float t=clamp(age/mix(.12,.6,uP1),0.,1.);
+  float c1=1.70158*uP2*1.5;float c3=c1+1.;
+  float eo=1.+c3*pow(t-1.,3.)+c1*pow(t-1.,2.);
+  float side=mod(last,2.)<.5?-1.:1.;
+  float off=(1.-eo)*side*A.x*1.3;
+  float ww=min(rh*4.*.92,A.x*.96);
+  float bl=(1.-t)*.35*uP3;
+  float m=0.;
+  for(int i=0;i<8;i++){
+    float fi=float(i)/7.;
+    vec2 tp=vec2((p.x-off+side*bl*fi)/ww+.5,(fy-.5)*rh*4./ww*.9+.5);
+    float inb=step(0.,tp.x)*step(tp.x,1.)*step(0.,tp.y)*step(tp.y,1.);
+    m+=textureLod(uText,tp,.5).r*inb*(1.-fi*.6);
+  }
+  m=clamp(m/5.2,0.,1.);
+  vec3 s=src(uv).rgb;
+  vec3 c=hsv(uP4+last*.13,.8,1.);
+  vec3 fillc=mix(c,s*1.3+.05,uP5);
+  vec3 col=s*uP6*(1.-m)+fillc*m;
+  return col+vec3(1.)*exp(-age*10.)*uP7*(.25+.75*m)*.8;
+}`},
+{ id:'type-echo', name:'Type · Echo Stack', cat:'Type', isNew:false,
+  desc:'A solid word at the centre throws a stream of outline copies that grow outward through the colour wheel. Beats push the stream.',
+  params:[['Copies',.3],['Speed',.35],['Spread',.35],['Size',.5],['Hue',.8],['Rainbow',.6],['Clip fill',0],['Background',.2]],
+  glsl:`
+vec3 fx(vec2 uv){
+  vec2 A=aspect();vec2 p=(uv-.5)*A;float k=kick();
+  float n=floor(mix(3.,12.,uP0)+.5);
+  float base=mix(.35,.8,uP3);
+  vec2 tw=vec2(A.x*.92,A.x*.92/4.)*base;
+  vec3 s=src(uv).rgb;
+  vec3 col=s*uP7;
+  float push=uTime*mix(.03,.3,uP1)+(floor(uBeats)+smoothstep(0.,.3,fract(uBeats)))*.06;
+  for(int i=0;i<12;i++){
+    float fi=float(i);if(fi>=n)break;
+    float ph=fract(fi/n+push);
+    float sc=1.+ph*mix(.6,4.,uP2)*(1.+.15*k);
+    vec2 tp=p/sc/tw+.5;
+    if(tp.x<0.||tp.x>1.||tp.y<0.||tp.y>1.)continue;
+    float v=textureLod(uText,tp,1.2).r;
+    float ol=smoothstep(.2,.45,v)*smoothstep(.75,.5,v);
+    col+=hsv(uP4+ph*uP5+uTime*.03,.75,1.)*ol*(1.-ph)*1.3;
+  }
+  vec2 tp0=p/(1.+.05*k)/tw+.5;
+  float m0=(tp0.x>0.&&tp0.x<1.&&tp0.y>0.&&tp0.y<1.)?texture(uText,tp0).r:0.;
+  vec3 fillc=mix(vec3(1.),s*1.3+.05,uP6);
+  return mix(col,fillc*(1.+.3*k),m0);
+}`},
+{ id:'halo', name:'Halo Frame', cat:'Borders', isNew:false,
+  desc:'A premium frosted-glass frame: the clip blurs into the glass band, a soft light glides along the inner edge, and the window casts a gentle shadow inward. Built for keynotes, award shows and concerts.',
+  params:[['Width',.35],['Corner radius',.4],['Frost',.6],['Edge light',.7],['Glide speed',.3],['Hue',.58],['Tint',.35],['Beat breathe',.3]],
+  glsl:`
+vec3 fx(vec2 uv){
+  vec2 A=aspect();vec2 p=(uv-.5)*A;float k=kick();
+  float w=mix(.02,.09,uP0);float rad=max(mix(0.,.08,uP1),.001);
+  vec2 bi=A*.5-w;
+  float di=sdRB(p,bi,rad);
+  float px=1./uRes.y;
+  vec3 s=src(uv).rgb;
+  vec3 content=s*(1.-.45*uP2*exp(min(di,0.)/.035));
+  vec3 tint=hsv(uP5,.35,1.);
+  vec3 fr=textureLod(uSrc,uv,mix(3.,5.5,uP2)).rgb;
+  vec3 glass=fr*.75+mix(vec3(.05),tint*.12,uP6)+vec3(.05)*(uv.y);
+  float inside=smoothstep(px,-px,di);
+  vec3 col=mix(glass,content,inside);
+  float s0=perim(p,bi,rad);
+  float sp=mix(.02,.25,uP4);
+  float sw=pow(.5+.5*cos(TAU*(s0-uTime*sp)),6.)+pow(.5+.5*cos(TAU*(s0+uTime*sp*.7+.5)),10.);
+  float line=smoothstep(px*1.5,0.,abs(di));
+  float glow=exp(-abs(di)/.012);
+  vec3 ec=mix(vec3(1.),tint,uP6);
+  float br=1.+uP7*.5*k;
+  col+=ec*(line*(.35+1.2*sw)+glow*(.07+.35*sw))*uP3*br;
+  float de=-sdRB(p,A*.5-px*2.,0.);
+  col+=ec*smoothstep(px*1.5,0.,abs(de))*.2*uP3;
+  return col;
+}`},
+{ id:'halo-aurora', name:'Halo · Aurora', cat:'Borders', isNew:false,
+  desc:'A fine line of light around the frame with aurora colours flowing along it and soft curtains drifting inward.',
+  params:[['Inset',.25],['Corner radius',.4],['Flow speed',.3],['Hue',.42],['Curtain depth',.5],['Beat lift',.4]],
+  glsl:`
+vec3 fx(vec2 uv){
+  vec2 A=aspect();vec2 p=(uv-.5)*A;float k=kick();
+  float m=mix(.01,.08,uP0);float rad=max(mix(0.,.08,uP1),.001);
+  vec2 b=A*.5-m;float d=sdRB(p,b,rad);float s=perim(p,b,rad);
+  float Lp=4.*(b.x-rad)+4.*(b.y-rad)+TAU*rad;
+  float t=uTime*mix(.02,.2,uP2);
+  vec3 col=src(uv).rgb*mix(1.,.25,smoothstep(0.,.01,d));
+  float h=uP3+.12*sin(TAU*(s*2.-t))+.08*sin(TAU*(s*5.+t*1.7));
+  vec3 c=hsv(h,.7,1.);
+  float I=.55+.45*sin(TAU*(s*3.-t*1.3));
+  float px=1./uRes.y;float ad=abs(d);
+  float line=smoothstep(px*1.5,0.,ad);
+  float inner=max(-d,0.);
+  float cur=pow(fbm(p*9.+vec2(t*2.,-t*1.6)+normalize(p+1e-4)*inner*6.),2.)*exp(-inner/mix(.02,.15,uP4));
+  col+=c*(line*1.2*I+exp(-ad/.006)*.45*I+cur*I*1.8*step(d,0.))*(1.+.6*k*uP5);
+  return col;
+}`},
+{ id:'halo-corners', name:'Halo · Corners', cat:'Borders', isNew:false,
+  desc:'Minimal broadcast framing: corner brackets that redraw every 4 bars, a hairline frame, ruler ticks, centre marks and a light that travels the edge.',
+  params:[['Inset',.35],['Bracket length',.45],['Thickness',.3],['Detail lines',.6],['Hue',.55],['Colour',0],['Beat pulse',.4]],
+  glsl:`
+vec3 fx(vec2 uv){
+  vec2 A=aspect();vec2 p=(uv-.5)*A;float k=kick();
+  float m=mix(.02,.08,uP0);vec2 b=A*.5-m;
+  float px=1./uRes.y;float th=px*mix(1.,4.,uP2);
+  vec3 c=mix(vec3(1.),hsv(uP4,.6,1.),uP5);
+  vec3 col=src(uv).rgb;
+  float draw=smoothstep(0.,1.,clamp(fract(uBeats/16.)*6.,0.,1.));
+  float Lfull=mix(.04,.2,uP1);float Lb=Lfull*draw;
+  vec2 q=abs(p);vec2 cb=q-b;
+  float br=smoothstep(th,0.,abs(cb.y))*step(-Lb,cb.x)*step(cb.x,th*.5)+smoothstep(th,0.,abs(cb.x))*step(-Lb,cb.y)*step(cb.y,th*.5);
+  float frameD=abs(sdRB(p,b,0.));
+  float hl=smoothstep(px*1.2,0.,frameD)*.2*uP3;
+  float cell=A.x/48.;
+  float tx=abs(fract(p.x/cell+.5)-.5)*cell;
+  float tick=smoothstep(px*1.2,0.,tx)*step(b.y-.012,q.y)*step(q.y,b.y)*step(q.x,b.x-Lfull-.01)*.45*uP3;
+  float cm=smoothstep(th,0.,abs(p.x))*step(b.y-.03,q.y)*step(q.y,b.y)+smoothstep(th,0.,abs(p.y))*step(b.x-.03,q.x)*step(q.x,b.x);
+  float s=perim(p,b,.001);float dt=abs(fract(s-uTime*.05+.5)-.5);
+  float dg=exp(-dt*300.)*exp(-frameD/.003);
+  float cg=exp(-length(cb)/.025);
+  col+=c*(br*(1.+.4*k*uP6)+hl+tick+cm*.7+dg*.9+cg*.12*(1.+k*uP6));
+  return col;
+}`},
+{ id:'cinema', name:'Cinema Look', cat:'Pinnacle', isNew:false,
+  desc:'Turns a live camera into a film: teal-and-orange grade, filmic highlights, red halation glow, grain, gate weave and an optional 2.39 letterbox.',
+  params:[['Grade',.6],['Letterbox',.0],['Halation',.5],['Grain',.4],['Gate weave',.3],['Vignette',.5],['Bloom',.35],['Exposure',.5]],
+  glsl:`
+vec3 fx(vec2 uv){
+  vec2 A=aspect();float t=uTime;
+  vec2 wv=vec2(vnoise(vec2(t*3.,1.))-.5,vnoise(vec2(t*2.5,7.))-.5)*.003*uP4;
+  vec2 u=uv+wv;
+  vec3 c=src(u).rgb*mix(.8,1.4,uP7);
+  vec3 b1=textureLod(uSrc,u,3.).rgb,b2=textureLod(uSrc,u,5.).rgb;
+  c+=max(b1*.6+b2*.6-.55,0.)*vec3(1.,.35,.15)*uP2*1.4;
+  c+=max(b2-.4,0.)*uP6*.8;
+  float l=luma(c);
+  vec3 grade=mix(vec3(.0,.45,.55)*1.6,vec3(1.,.62,.35)*1.3,smoothstep(.05,.7,l));
+  vec3 g=c*mix(vec3(1.),grade,uP0*.6);
+  g=mix(vec3(luma(g)),g,1.+uP0*.15);
+  g=max(g,0.);g=(g*(2.51*g+.03))/(g*(2.43*g+.59)+.14);
+  vec2 d=(uv-.5)*vec2(A.x/1.6,1.);
+  g*=1.-uP5*.7*smoothstep(.3,.95,length(d)*1.3);
+  g+=(h21(uv*uRes+fract(t*24.)*311.)-.5)*uP3*.12*(1.-l*.5);
+  float target=mix(A.x,2.39,uP1);float barH=max(0.,1.-A.x/target)*.5;
+  return g*step(barH,uv.y)*step(uv.y,1.-barH);
+}`},
+{ id:'hologram', name:'Hologram', cat:'Pinnacle', isNew:false,
+  desc:'The performer as a projected hologram: tinted light, scanlines, edge glow, flicker, glitch tears on the beat, and a projector beam. Dark areas fall away.',
+  params:[['Hue',.5],['Scanlines',.6],['Glitch',.5],['Edge glow',.6],['Flicker',.4],['Background',.0],['Beam',.5],['Key',.4]],
+  glsl:`
+float lumL(vec2 uv,float lod){return luma(textureLod(uSrc,uv,lod).rgb);}
+vec3 fx(vec2 uv){
+  vec2 A=aspect();vec2 p=(uv-.5)*A;float k=kick();
+  float tk=floor(uTime*20.);
+  float gl=step(1.-uP2*.25,h11(floor(uTime*6.)*1.3))+k*uP2*.6;
+  float sh=(h11(floor(uv.y*70.)+tk)-.5)*.03*gl;
+  vec2 u=uv+vec2(sh,0.);vec2 px=1.5/uRes;
+  float l=lumL(u,.5);
+  float gx=lumL(u+vec2(px.x,0.),1.)-lumL(u-vec2(px.x,0.),1.);
+  float gy=lumL(u+vec2(0.,px.y),1.)-lumL(u-vec2(0.,px.y),1.);
+  float e=smoothstep(.02,.12,length(vec2(gx,gy)));
+  vec3 hc=hsv(uP0,.55,1.);
+  float lr=lumL(u+vec2(.004,0.),.5),lb=lumL(u-vec2(.004,0.),.5);
+  vec3 holo=hc*pow(l,1.3)*1.4+vec3(lr*.3,0.,lb*.3)+hc*e*uP3*1.6;
+  float scan=mix(1.,.55+.45*step(.5,fract(uv.y*uRes.y*.25)),uP1);
+  float band=1.-uP1*.25*(.5+.5*sin(uv.y*30.-uTime*4.));
+  float flick=1.-uP4*.3*h11(tk*.77);
+  float key=smoothstep(uP7*.4,uP7*.4+.15,l);
+  vec3 bg=src(uv).rgb*uP5*.5;
+  float beam=exp(-abs(p.x)/(.05+.35*uv.y))*smoothstep(1.,0.,uv.y)*.12*uP6;
+  return bg+holo*scan*band*flick*(.85+.4*k)*key+hc*beam;
+}`},
+{ id:'thermal', name:'Thermal', cat:'Pinnacle', isNew:false,
+  desc:'Thermal-camera look for live feeds: iron, rainbow or arctic palettes, white-hot or black-hot, a scale bar and crosshair, and a heat pulse on the beat.',
+  params:[['Contrast',.5],['Palette',0],['Black-hot',0],['Smoothing',.35],['HUD',.7],['Beat heat',.5],['Sensor noise',.4]],
+  glsl:`
+vec3 ironP(float t){
+  vec3 c0=vec3(0.),c1=vec3(.25,0.,.45),c2=vec3(.8,.05,.3),c3=vec3(1.,.45,0.),c4=vec3(1.,.9,.2),c5=vec3(1.);
+  t=clamp(t,0.,1.)*5.;
+  return t<1.?mix(c0,c1,t):t<2.?mix(c1,c2,t-1.):t<3.?mix(c2,c3,t-2.):t<4.?mix(c3,c4,t-3.):mix(c4,c5,t-4.);
+}
+vec3 palT(float t,float pl){return pl<.5?ironP(t):pl<1.5?hsv(.7-.75*t,.9,smoothstep(0.,.25,t)*.85+.15):mix(vec3(0.,.02,.1),vec3(.85,.95,1.),t)*vec3(.6+.4*t,.8+.2*t,1.);}
+vec3 fx(vec2 uv){
+  vec2 A=aspect();vec2 p=(uv-.5)*A;float k=kick();
+  float l=luma(textureLod(uSrc,uv,mix(0.,3.,uP3)).rgb);
+  l=clamp((l-.45)*mix(.8,2.5,uP0)+.5,0.,1.);
+  if(uP2>.5)l=1.-l;
+  l+=k*uP5*.12*smoothstep(.3,.8,l);
+  l+=(h21(uv*uRes*.5+floor(uTime*24.))-.5)*.05*uP6;
+  float pl=floor(uP1*2.99);
+  vec3 col=palT(l,pl);
+  float px=1./uRes.y;float sx=A.x*.5-.06;
+  if(abs(p.x-sx)<.012&&abs(p.y)<.3)col=mix(col,palT((p.y+.3)/.6,pl),uP4);
+  float tk=step(abs(fract((p.y+.3)/.6*10.+.5)-.5),.05)*step(abs(p.y),.3)*step(abs(p.x-sx-.022),.006);
+  vec2 aq=abs(p);
+  float ch=smoothstep(px*1.5,0.,aq.y)*step(.015,aq.x)*step(aq.x,.05)+smoothstep(px*1.5,0.,aq.x)*step(.015,aq.y)*step(aq.y,.05);
+  return mix(col,vec3(1.),clamp(tk+ch,0.,1.)*uP4*.9);
+}`},
+{ id:'clonewall', name:'Clone Wall', cat:'Pinnacle', isNew:false, hist:true,
+  desc:'The live feed repeated in a grid, each tile a few frames behind the last so movement ripples across the wall. Pop colours per tile, and the order can reshuffle on the beat.',
+  params:[['Grid',.35],['Delay step',.5],['Colour mode',.7],['Gap',.3],['Zoom',.4],['Beat shuffle',1]],
+  glsl:`
+vec3 fx(vec2 uv){
+  float n=floor(mix(2.,5.,uP0)+.5);
+  vec2 g=uv*n;vec2 id=floor(g);vec2 tu=fract(g);
+  float gap=mix(0.,.06,uP3);
+  if(tu.x<gap*.5||tu.x>1.-gap*.5||tu.y<gap*.5||tu.y>1.-gap*.5)return vec3(.01);
+  tu=(tu-gap*.5)/(1.-gap);
+  vec2 cu=.5+(tu-.5)*mix(1.,.55,uP4);
+  float idx=id.x+(n-1.-id.y)*n;
+  float ord=mod(idx+floor(uBeats)*step(.5,uP5),n*n);
+  float delay=ord*mix(0.,4.,uP1);
+  vec3 c=delay<.5?src(cu).rgb:hist(cu,delay);
+  float mode=floor(uP2*2.99);
+  if(mode>.5&&mode<1.5)c=hue(c,ord/(n*n)*TAU);
+  else if(mode>1.5){float l=luma(c);c=mix(hsv(ord*.17+uTime*.02,.85,.22),hsv(ord*.17+.45,.7,1.),smoothstep(.15,.7,l));}
+  return c*(1.+.25*kick()*step(ord,.5));
+}`},
+{ id:'popduo', name:'Pop Duotone', cat:'Pinnacle', isNew:false,
+  desc:'Screen-print poster look: posterised duotone, halftone dots, bold outlines and off-register ink. The palette can flip every bar.',
+  params:[['Hue',.92],['Levels',.3],['Halftone',.6],['Outline',.6],['Misregister',.5],['Bar palette swap',1]],
+  glsl:`
+vec3 fx(vec2 uv){
+  vec2 A=aspect();float k=kick();
+  float h0=uP0+floor(uBeats/4.)*.37*step(.5,uP5);
+  vec3 ca=hsv(h0,.85,.16),cb=hsv(h0+.5,.7,1.),cc=hsv(h0+.15,.9,.95);
+  vec2 off=vec2(.007,.004)*uP4;
+  float l=luma(textureLod(uSrc,uv,.5).rgb);
+  float l2=luma(textureLod(uSrc,uv+off,.5).rgb);
+  float lev=floor(mix(2.,6.,uP1)+.5);
+  float q=floor(clamp(l*1.15,0.,.999)*lev)/(lev-1.);
+  vec3 col=mix(ca,cb,q);
+  vec2 hp=rot(.6)*(uv-.5)*A*110.;
+  float r=sqrt(clamp(l*1.3,0.,1.))*.6;
+  float dotm=smoothstep(r,r-.1,length(fract(hp)-.5));
+  col=mix(col,cc,dotm*uP2*(1.-q)*.9);
+  col=mix(col,cc,smoothstep(.55,.6,l2)*(1.-smoothstep(.55,.6,l))*uP4);
+  vec2 px=1.5/uRes;
+  float gx=luma(textureLod(uSrc,uv+vec2(px.x,0.),1.).rgb)-luma(textureLod(uSrc,uv-vec2(px.x,0.),1.).rgb);
+  float gy=luma(textureLod(uSrc,uv+vec2(0.,px.y),1.).rgb)-luma(textureLod(uSrc,uv-vec2(0.,px.y),1.).rgb);
+  col*=1.-smoothstep(.04,.12,length(vec2(gx,gy)))*uP3;
+  return col*(1.+.15*k);
+}`},
+{ id:'vhs', name:'VHS Camcorder', cat:'Pinnacle', isNew:false,
+  desc:'The live feed as a 90s camcorder tape: line wobble, a rolling tracking band, chroma bleed, tape noise, dropouts, head-switching at the bottom and a blinking REC dot.',
+  params:[['Wobble',.5],['Tracking',.5],['Chroma bleed',.6],['Tape noise',.5],['Softness',.4],['Colour fade',.5],['REC dot',1]],
+  glsl:`
+vec3 fx(vec2 uv){
+  vec2 A=aspect();float t=uTime;
+  float wob=(vnoise(vec2(uv.y*25.,t*6.))-.5)*.006*uP0;
+  float ty=fract(t*.07);
+  float band=exp(-abs(uv.y-ty)*40.)*uP1;
+  wob+=band*(vnoise(vec2(uv.y*200.,t*30.))-.5)*.05;
+  float hs=step(uv.y,.03)*(vnoise(vec2(uv.y*80.,t*20.))-.2)*.03;
+  vec2 u=vec2(uv.x+wob+hs,uv.y);
+  vec3 c=textureLod(uSrc,u,mix(.5,2.,uP4)).rgb;
+  mat3 toY=mat3(.299,.596,.211,.587,-.274,-.523,.114,-.322,.312);
+  mat3 toR=mat3(1.,1.,1.,.956,-.272,-1.106,.621,-.647,1.703);
+  vec3 yiq=toY*c;vec3 ch=vec3(0.);
+  for(int i=0;i<8;i++){ch+=toY*textureLod(uSrc,u-vec2(float(i)*.0025*uP2+.004*uP2,0.),2.).rgb;}
+  ch/=8.;
+  yiq.yz=mix(yiq.yz,ch.yz,uP2);
+  c=toR*yiq;
+  c=mix(c,vec3(luma(c)),.25*uP5);c=c*vec3(1.05,1.,.92)*(1.-.1*uP5)+.06*uP5;
+  float nz=h21(vec2(floor(uv.y*uRes.y*.5),floor(t*30.)))*h21(uv*uRes+t);
+  c+=(nz-.25)*.12*uP3+band*.3*h21(uv*uRes*.3+t);
+  float row=floor(uv.y*240.);float tf=floor(t*15.);
+  float dr=step(.9985-.003*uP3,h21(vec2(row,tf)))*step(abs(uv.x-h11(row+tf*1.7)),.03+.12*h11(row*3.1+tf));
+  c+=dr*.6;
+  vec2 p=(uv-.5)*A;vec2 rp=p-vec2(-A.x*.5+.08,.42);
+  c=mix(c,vec3(1.,.1,.1),smoothstep(.014,.011,length(rp))*step(.5,fract(t*.8))*uP6);
+  return c*(1.-.3*pow(length(uv-.5)*1.3,3.));
+}`},
+{ id:'pointcloud', name:'Point Cloud', cat:'Pinnacle', isNew:false,
+  desc:'The live feed rebuilt as a 3D cloud of glowing points, pushed forward by brightness and orbiting slowly like a volumetric capture. Kicks punch the depth.',
+  params:[['Density',.4],['Orbit speed',.35],['Orbit angle',.5],['Depth',.45],['Dot size',.5],['Glow',.5],['Mono tint',0],['Key',.3]],
+  glsl:`
+vec3 fx(vec2 uv){
+  vec2 A=aspect();vec2 p=(uv-.5)*A;float k=kick();
+  float rows=floor(mix(40.,130.,uP0));float cs=1./rows;
+  float ry=floor((p.y+.5)/cs);float cy=(ry+.5)*cs-.5;float fy=p.y-cy;
+  float ang=sin(uTime*mix(.1,.8,uP1))*mix(.1,.7,uP2);
+  float ca=cos(ang),sa=sin(ang);
+  float depth=mix(.05,.4,uP3)*(1.+.5*k);
+  float x0=(p.x-max(depth*sa,0.))/ca,x1=(p.x-min(depth*sa,0.))/ca;
+  float c0=floor((x0+A.x*.5)/cs)-1.,c1=floor((x1+A.x*.5)/cs)+1.;
+  vec3 col=vec3(0.);
+  vec3 tint=hsv(.55+uTime*.02,.6,1.);
+  for(int i=0;i<64;i++){
+    float ci=c0+float(i);if(ci>c1)break;
+    float gx=(ci+.5)*cs-A.x*.5;
+    if(abs(gx)>A.x*.5)continue;
+    vec3 c=textureLod(uSrc,vec2(gx/A.x+.5,cy+.5),1.).rgb;float l=luma(c);
+    float z=l*depth;
+    float X=gx*ca+z*sa;
+    float r=cs*mix(.15,.5,uP4)*(.4+l)*(1.+z*2.);
+    float d=length(vec2(p.x-X,fy));
+    float dt=smoothstep(r,r*.3,d)+exp(-d/(r*1.5))*.35*uP5;
+    vec3 pc=mix(c*1.4+.04,tint*(.3+l),uP6);
+    col=max(col,pc*dt*smoothstep(uP7*.3,uP7*.3+.1,l));
+  }
+  return col;
+}`},
+{ id:'aura', name:'Aura', cat:'Aura', isNew:false,
+  desc:'An energy aura streams off the outline of whoever is on camera, rising and swirling like heat, with colour drifting through it. Kicks flare it up.',
+  params:[['Edge threshold',.3],['Rise',.5],['Persistence',.65],['Turbulence',.5],['Hue',.55],['Hue spread',.5],['Darken feed',.35]],
+  glsl:`
+vec3 fx(vec2 uv){
+  vec2 A=aspect();vec2 p=(uv-.5)*A;float k=kick();
+  vec3 s=src(uv).rgb;
+  vec2 px=1.5/uRes;
+  float gx=luma(textureLod(uSrc,uv+vec2(px.x,0.),1.5).rgb)-luma(textureLod(uSrc,uv-vec2(px.x,0.),1.5).rgb);
+  float gy=luma(textureLod(uSrc,uv+vec2(0.,px.y),1.5).rgb)-luma(textureLod(uSrc,uv-vec2(0.,px.y),1.5).rgb);
+  float th=mix(.03,.3,uP0);
+  float e=smoothstep(th,th*2.+.03,length(vec2(gx,gy)));
+  vec2 fl=vec2(fbm(p*4.+uTime*.3)-.5,fbm(p*4.+vec2(5.,2.)-uTime*.3)-.5)*mix(0.,.012,uP3);
+  vec2 q=p-vec2(0.,mix(.0,.006,uP1))+fl;
+  float pa=texture(uPrev,q/A+.5).a*mix(.85,.985,uP2);
+  float a=max(pa,e*(.7+.5*k));
+  gA=a;
+  vec3 ac=hsv(uP4+uTime*.05+p.y*.4*uP5+fl.x*20.*uP5,.8,1.);
+  return s*mix(1.,.5,uP6)+ac*a*a*1.4*(1.+.5*k);
+}`},
+{ id:'dream', name:'Dream Bloom', cat:'Pinnacle', isNew:false,
+  desc:'A beauty glow for live feeds: soft diffusion, prism fringes, four-point star glints on highlights, a pastel grade and drifting light leaks.',
+  params:[['Diffusion',.55],['Prism',.4],['Star glints',.6],['Star length',.5],['Pastel grade',.4],['Light leak',.4],['Glint threshold',.5]],
+  glsl:`
+vec3 brightS(vec2 uv,float th){vec3 c=textureLod(uSrc,uv,1.5).rgb;return c*smoothstep(th,th+.15,luma(c));}
+vec3 fx(vec2 uv){
+  vec2 A=aspect();float k=kick();
+  vec2 c0=uv-.5;float pr=uP1*.008;
+  vec3 s=vec3(src(uv+c0*pr).r,src(uv).g,src(uv-c0*pr).b);
+  vec3 b3=textureLod(uSrc,uv,3.).rgb,b5=textureLod(uSrc,uv,5.).rgb;
+  vec3 col=mix(s,max(s,b3),uP0*.6)+b5*uP0*.35;
+  float th=mix(.5,.95,uP6);float len=mix(.03,.2,uP3);
+  vec3 st=vec3(0.);
+  for(int i=1;i<=12;i++){float fi=float(i)/12.;float w=exp(-fi*4.);vec2 o=vec2(fi*len/A.x,0.);vec2 o2=vec2(0.,fi*len);
+    st+=(brightS(uv+o,th)+brightS(uv-o,th)+brightS(uv+o2,th)+brightS(uv-o2,th))*w;}
+  col+=st*.35*uP2*(1.+.5*k);
+  col=mix(col,col*.85+vec3(.08,.05,.1),uP4);
+  col=mix(col,mix(vec3(luma(col)),col,.8),uP4*.5);
+  float lk=fbm(vec2(uv.x*1.2+uTime*.03,uv.y*1.5));
+  col+=hsv(.9+.15*sin(uTime*.1),.5,1.)*pow(lk,3.)*smoothstep(.6,0.,min(uv.x,1.-uv.x))*uP5*.8;
+  return col;
+}`},
+{ id:'slicetrace', name:'Slice Trace', cat:'Borders', isNew:false,
+  desc:'Rebuilt from your event video: white light flows around each slice like liquid. Streaks stretch, taper, split and drain away unpredictably, thinning to fine tips.',
+  params:[['Slices',.5],['Centre width',.59],['Inset',.25],['Corner radius',.4],['Amount',.5],['Flow speed',.4],['Thickness',.4],['Glow',.4]],
+  glsl: SLICE_LIB + `
+vec3 fx(vec2 uv){
+  vec2 A=aspect();vec2 p=(uv-.5)*A;float k=kick();
+  float n=floor(mix(1.,5.,uP0)+.5);float wc=mix(1.,4.,uP1);
+  float inset=mix(.004,.03,uP2);float rad=mix(0.,.05,uP3);
+  float px=1./uRes.y;float t=uTime*mix(.1,1.2,uP5);float thr=mix(.64,.42,uP4);
+  vec3 col=src(uv).rgb;vec3 L=vec3(0.);float x0=-A.x*.5;
+  for(int i=0;i<5;i++){
+    float fi=float(i);if(fi>=n)break;
+    vec2 c,b;float r;sliceAt(fi,n,wc,inset,rad,A,x0,c,b,r);
+    vec2 q=p-c;float d=sdRB(q,b,r);float ad=abs(d);
+    if(ad>.06)continue;
+    float s=perim(q,b,r);
+    float v=liqV(s,t,fi*3.17,.5,mod(fi,2.)<.5?1.:-1.);
+    float I=smoothstep(thr,thr+.12,v);
+    float w=px*mix(.8,3.,uP6)*(.3+.9*I);
+    float line=smoothstep(w+px*.8,w-px*.2,ad)*I;
+    float glow=exp(-ad/mix(.002,.012,uP7))*I;
+    L+=vec3(1.)*(line*1.4+glow*.45)*(1.+.25*k)+vec3(1.)*smoothstep(px*1.2,0.,ad)*.03;
+  }
+  return col+L;
+}`},
+{ id:'slice-mercury', name:'Slice Trace · Mercury', cat:'Borders', isNew:false,
+  desc:'Liquid metal running around each slice: rounded silver beads that swell, merge and split, catching a moving highlight.',
+  params:[['Slices',.5],['Centre width',.59],['Inset',.25],['Corner radius',.4],['Amount',.5],['Flow speed',.35],['Thickness',.5],['Shine',.7]],
+  glsl: SLICE_LIB + `
+vec3 fx(vec2 uv){
+  vec2 A=aspect();vec2 p=(uv-.5)*A;float k=kick();
+  float n=floor(mix(1.,5.,uP0)+.5);float wc=mix(1.,4.,uP1);
+  float inset=mix(.006,.03,uP2);float rad=mix(0.,.05,uP3);
+  float px=1./uRes.y;float t=uTime*mix(.1,1.2,uP5);float thr=mix(.62,.44,uP4);
+  vec3 col=src(uv).rgb;float x0=-A.x*.5;vec3 G=vec3(0.);
+  for(int i=0;i<5;i++){
+    float fi=float(i);if(fi>=n)break;
+    vec2 c,b;float r;sliceAt(fi,n,wc,inset,rad,A,x0,c,b,r);
+    vec2 q=p-c;float d=sdRB(q,b,r);float ad=abs(d);
+    if(ad>.05)continue;
+    float s=perim(q,b,r);float a=TAU*s;
+    float v=liqV(s,t,fi*3.17,.55,mod(fi,2.)<.5?1.:-1.)+.12*(vnoise(vec2(cos(a),sin(a))*9.+t*.8+fi)-.5);
+    float I=smoothstep(thr,thr+.05,v);
+    float w=px*mix(2.,7.,uP6)*(.25+.9*smoothstep(thr,thr+.25,v));
+    float y=d/max(w,1e-5);
+    float cov=I*smoothstep(1.,.75,abs(y));
+    float z=sqrt(max(1.-y*y,0.));
+    float env=.5+.5*sin(y*3.+a*12.+uTime*.6);
+    vec3 metal=mix(vec3(.22,.24,.28),vec3(1.),smoothstep(.3,.9,env))*(.45+.55*z);
+    metal+=vec3(1.)*pow(max(0.,1.-abs(y+.35)*3.),6.)*uP7*(1.+.5*k);
+    col=mix(col,metal,cov);
+    G+=vec3(.85,.9,1.)*exp(-ad/.006)*I*.2;
+  }
+  return col+G;
+}`},
+{ id:'slice-neon', name:'Slice Trace · Neon Liquid', cat:'Borders', isNew:false,
+  desc:'The same liquid flow in colour: streams of neon whose hue drifts along the outline, with a white-hot core and soft bloom.',
+  params:[['Slices',.5],['Centre width',.59],['Inset',.25],['Corner radius',.4],['Amount',.5],['Flow speed',.4],['Hue',.85],['Colour spread',.5]],
+  glsl: SLICE_LIB + `
+vec3 fx(vec2 uv){
+  vec2 A=aspect();vec2 p=(uv-.5)*A;float k=kick();
+  float n=floor(mix(1.,5.,uP0)+.5);float wc=mix(1.,4.,uP1);
+  float inset=mix(.004,.03,uP2);float rad=mix(0.,.05,uP3);
+  float px=1./uRes.y;float t=uTime*mix(.1,1.2,uP5);float thr=mix(.64,.42,uP4);
+  vec3 col=src(uv).rgb;vec3 L=vec3(0.);float x0=-A.x*.5;
+  for(int i=0;i<5;i++){
+    float fi=float(i);if(fi>=n)break;
+    vec2 c,b;float r;sliceAt(fi,n,wc,inset,rad,A,x0,c,b,r);
+    vec2 q=p-c;float d=sdRB(q,b,r);float ad=abs(d);
+    if(ad>.08)continue;
+    float s=perim(q,b,r);
+    float v=liqV(s,t,fi*3.17,.5,mod(fi,2.)<.5?1.:-1.);
+    float I=smoothstep(thr,thr+.14,v);
+    vec3 nc=hsv(uP6+sin(TAU*s)*uP7*.4+v*.3+uTime*.03+fi*.08,.8,1.);
+    float w=px*1.6*(.3+.9*I);
+    float line=smoothstep(w+px*.8,w-px*.2,ad)*I;
+    L+=nc*(line*1.3+exp(-ad/.006)*I*.6+exp(-ad/.025)*I*.25)*(1.+.35*k)+vec3(1.)*line*.6*I;
+  }
+  return col+L;
+}`},
+{ id:'slice-surge', name:'Slice Trace · Surge', cat:'Borders', isNew:false,
+  desc:'Calm liquid streaks until the beat hits: then a surge pours from the top of each slice and races down both sides before draining away.',
+  params:[['Slices',.5],['Centre width',.59],['Inset',.25],['Corner radius',.4],['Amount',.35],['Surge strength',.8],['Surge speed',.5],['Glow',.5]],
+  glsl: SLICE_LIB + `
+vec3 fx(vec2 uv){
+  vec2 A=aspect();vec2 p=(uv-.5)*A;float k=kick();
+  float n=floor(mix(1.,5.,uP0)+.5);float wc=mix(1.,4.,uP1);
+  float inset=mix(.004,.03,uP2);float rad=mix(0.,.05,uP3);
+  float px=1./uRes.y;float t=uTime*.45;float thr=mix(.66,.46,uP4)-k*.08*uP5;
+  float front=fract(uBeats)*mix(.25,.9,uP6)*.5;
+  vec3 col=src(uv).rgb;vec3 L=vec3(0.);float x0=-A.x*.5;
+  for(int i=0;i<5;i++){
+    float fi=float(i);if(fi>=n)break;
+    vec2 c,b;float r;sliceAt(fi,n,wc,inset,rad,A,x0,c,b,r);
+    vec2 q=p-c;float d=sdRB(q,b,r);float ad=abs(d);
+    if(ad>.06)continue;
+    float s=perim(q,b,r);
+    float v=liqV(s,t,fi*3.17,.5,mod(fi,2.)<.5?1.:-1.);
+    float I=smoothstep(thr,thr+.12,v)*.75;
+    float sd=min(s,1.-s);
+    float wob=.6+.6*liqV(s,uTime*1.5,fi*5.1+9.,.8,1.);
+    float surge=smoothstep(front+.012,front-.004,sd)*exp(-max(front-sd,0.)*mix(30.,8.,uP6))*wob*uP5*(1.-fract(uBeats)*.6);
+    I=max(I,clamp(surge,0.,1.2));
+    float w=px*2.*(.3+.9*min(I,1.));
+    float line=smoothstep(w+px*.8,w-px*.2,ad)*I;
+    L+=vec3(1.)*(line*1.4+exp(-ad/mix(.002,.014,uP7))*I*.5)+vec3(1.)*smoothstep(px*1.2,0.,ad)*.03;
+  }
+  return col+L;
+}`},
+{ id:'slice-braid', name:'Slice Trace · Braid', cat:'Borders', isNew:false,
+  desc:'Two liquid streams, one white and one in an accent colour, weave over and under each other as they flow around every slice.',
+  params:[['Slices',.5],['Centre width',.59],['Inset',.3],['Corner radius',.4],['Amount',.55],['Flow speed',.4],['Braid width',.2],['Accent hue',.6]],
+  glsl: SLICE_LIB + `
+vec3 fx(vec2 uv){
+  vec2 A=aspect();vec2 p=(uv-.5)*A;float k=kick();
+  float n=floor(mix(1.,5.,uP0)+.5);float wc=mix(1.,4.,uP1);
+  float inset=mix(.008,.035,uP2);float rad=mix(0.,.05,uP3);
+  float px=1./uRes.y;float t=uTime*mix(.1,1.2,uP5);float thr=mix(.64,.42,uP4);
+  float bw=mix(.002,.012,uP6);
+  vec3 col=src(uv).rgb;vec3 L=vec3(0.);float x0=-A.x*.5;
+  for(int i=0;i<5;i++){
+    float fi=float(i);if(fi>=n)break;
+    vec2 c,b;float r;sliceAt(fi,n,wc,inset,rad,A,x0,c,b,r);
+    vec2 q=p-c;float d=sdRB(q,b,r);
+    if(abs(d)>.06)continue;
+    float s=perim(q,b,r);
+    for(int j=0;j<2;j++){
+      float fj=float(j);
+      float off=sin(TAU*s*14.-t*3.*(fj*2.-1.)+fj*PI)*bw;
+      float ad=abs(d+off);
+      float v=liqV(s,t,fi*3.17+fj*11.,.5,(mod(fi,2.)<.5?1.:-1.)*(fj*2.-1.));
+      float I=smoothstep(thr,thr+.12,v);
+      vec3 lc=fj<.5?vec3(1.):hsv(uP7,.7,1.);
+      float front=.75+.25*sin(TAU*s*14.-t*3.*(fj*2.-1.)+fj*PI+PI*.5);
+      float w=px*1.6*(.3+.9*I);
+      L+=lc*(smoothstep(w+px*.8,w-px*.2,ad)*1.3+exp(-ad/.005)*.4)*I*front*(1.+.3*k);
+    }
+  }
+  return col+L;
+}`},
+{ id:'slice-spill', name:'Slice Trace · Spill', cat:'Borders', isNew:false,
+  desc:'The liquid outline spills light into each slice: wherever a streak flows, a soft wash bleeds inward and ripples, then fades as the streak moves on.',
+  params:[['Slices',.5],['Centre width',.59],['Inset',.25],['Corner radius',.4],['Amount',.5],['Flow speed',.4],['Spill depth',.5],['Tint',0]],
+  glsl: SLICE_LIB + `
+vec3 fx(vec2 uv){
+  vec2 A=aspect();vec2 p=(uv-.5)*A;float k=kick();
+  float n=floor(mix(1.,5.,uP0)+.5);float wc=mix(1.,4.,uP1);
+  float inset=mix(.004,.03,uP2);float rad=mix(0.,.05,uP3);
+  float px=1./uRes.y;float t=uTime*mix(.1,1.2,uP5);float thr=mix(.64,.42,uP4);
+  vec3 tc=uP7<.02?vec3(1.):hsv(uP7,.6,1.);
+  vec3 col=src(uv).rgb;vec3 L=vec3(0.);float x0=-A.x*.5;
+  float depth=mix(.008,.05,uP6);
+  for(int i=0;i<5;i++){
+    float fi=float(i);if(fi>=n)break;
+    vec2 c,b;float r;sliceAt(fi,n,wc,inset,rad,A,x0,c,b,r);
+    vec2 q=p-c;float d=sdRB(q,b,r);float ad=abs(d);
+    if(d>.03||-d>depth*4.)continue;
+    float s=perim(q,b,r);float a=TAU*s;
+    float v=liqV(s,t,fi*3.17,.5,mod(fi,2.)<.5?1.:-1.);
+    float I=smoothstep(thr,thr+.12,v);
+    float Is=smoothstep(thr-.1,thr+.2,v);
+    float w=px*2.*(.3+.9*I);
+    float line=smoothstep(w+px*.8,w-px*.2,ad)*I;
+    float inner=max(-d,0.);
+    float rip=.5+.6*fbm(vec2(cos(a),sin(a))*5.+vec2(inner*18.-t*1.5,fi));
+    float spill=Is*exp(-inner/depth)*rip*step(d,0.)*smoothstep(depth*4.,depth*2.,inner);
+    L+=tc*(line*1.4+exp(-ad/.006)*I*.4+spill*.35*(1.+.4*k));
+  }
+  return col+L;
+}`},
+{ id:'aura-flame', name:'Aura · Flame', cat:'Aura', isNew:false,
+  desc:'Flames rise off the performer’s outline and cool from white-hot to deep red as they climb. Set Flame hue for blue or green fire.',
+  params:[['Reach',.5],['Rise',.5],['Turbulence',.5],['Height',.55],['Flame hue',0],['Darken background',.4],['Subject in front',1],['Key',.25]],
+  glsl: AURA_LIB + `
+vec3 firec(float h,float hr){vec3 c=clamp(vec3(h*2.6,h*2.6-.95,h*2.6-1.9),0.,1.);return hue(c,hr*TAU);}
+vec3 fx(vec2 uv){
+  KEYED=isKeyed();
+  vec2 A=aspect();vec2 p=(uv-.5)*A;float k=kick();float key=uP7*.5;
+  float M=matte(uv,0.,key);
+  float F=field(uv,key,uP0);
+  float ring=clamp(F*1.5-M*.9,0.,1.);
+  vec2 cu=vec2(fbm(p*5.+vec2(0.,-uTime*1.5))-.5,fbm(p*5.+vec2(4.,-uTime*1.3))-.5);
+  vec2 q=p-vec2(0.,mix(.002,.009,uP1))+cu*mix(0.,.012,uP2);
+  float pa=texture(uPrev,q/A+.5).a*mix(.86,.97,uP3);
+  float h=max(pa-.004,ring*(.55+.45*fbm(p*12.-vec2(0.,uTime*3.)))*(.8+.6*k));
+  gA=h;
+  vec3 s=src(uv).rgb;
+  vec3 col=s*(1.-M)*mix(1.,.3,uP5)+firec(h,uP4)*1.2;
+  return mix(col,s,M*uP6);
+}`},
+{ id:'aura-photo', name:'Aura · Photo', cat:'Aura', isNew:false,
+  desc:'Inspired by aura-camera portraits: soft clouds of colour bloom around the person like a double exposure, with an instant-film finish.',
+  params:[['Reach',.85],['Drift',.35],['Hue',.8],['Darken background',.6],['Intensity',.75],['Wash over subject',.35],['Film finish',.5],['Key',.25]],
+  glsl: AURA_LIB + `
+vec3 fx(vec2 uv){
+  KEYED=isKeyed();
+  vec2 A=aspect();vec2 p=(uv-.5)*A;float k=kick();float key=uP7*.5;
+  float M=matte(uv,0.,key);
+  float F=field(uv,key,uP0);
+  float n=fbm(p*2.5+uTime*mix(.02,.2,uP1));
+  float cloud=smoothstep(0.,.9,F)*(.6+.6*n);
+  float ang=atan(p.y+.1,p.x);
+  vec3 c1=hsv(uP2,.75,1.),c2=hsv(uP2+.22,.7,1.),c3=hsv(uP2+.55,.65,1.);
+  vec3 ac=mix(mix(c1,c2,smoothstep(-.6,.6,sin(ang+uTime*.1+n*3.))),c3,smoothstep(.3,.9,n+p.y*.4));
+  vec3 s=src(uv).rgb;
+  vec3 bg=mix(s,textureLod(uSrc,uv,5.).rgb,.6)*mix(1.,.15,uP3);
+  vec3 col=bg+ac*cloud*mix(.6,1.6,uP4)*(1.+.3*k);
+  col=mix(col,s+ac*cloud*.25*uP5,M);
+  col=mix(col,col*vec3(1.04,1.,.94)+.04,.5*uP6);
+  return col*(1.-.3*uP6*pow(length(uv-.5)*1.4,2.5));
+}`},
+{ id:'aura-electric', name:'Aura · Electric', cat:'Aura', isNew:false,
+  desc:'Crackling plasma arcs branch off the performer, flickering between beats and surging outward on every kick.',
+  params:[['Reach',.5],['Crackle rate',.5],['Detail',.45],['Hue',.62],['Darken background',.5],['Beat surge',.6],['Subject in front',1],['Key',.25]],
+  glsl: AURA_LIB + `
+vec3 fx(vec2 uv){
+  KEYED=isKeyed();
+  vec2 A=aspect();vec2 p=(uv-.5)*A;float k=kick();float key=uP7*.5;
+  float M=matte(uv,0.,key);
+  float F=field(uv,key,clamp(uP0+k*.35*uP5,0.,1.));
+  float band=F*(1.-M);
+  float tk=floor(uTime*mix(8.,30.,uP1));
+  vec2 q=p*mix(4.,10.,uP2)+vec2(h11(tk)*10.,h11(tk+3.)*10.);
+  float r1=1.-abs(fbm(q)*2.-1.),r2=1.-abs(fbm(q*2.1+7.)*2.-1.);
+  float arcs=pow(r1,mix(18.,8.,band))*band*2.+pow(r2,22.)*band*1.2;
+  vec3 ec=hsv(uP3,.6,1.);
+  vec3 s=src(uv).rgb;
+  vec3 col=s*mix(1.,.4,uP4)*(1.-M)+s*M;
+  col+=ec*arcs*.8*(1.+k)+vec3(1.)*smoothstep(.5,.9,arcs)*.8+ec*F*.15*(1.+2.*k)*(1.-M);
+  return mix(col,s+ec*.12*F,M*uP6);
+}`},
+{ id:'aura-embers', name:'Aura · Embers', cat:'Aura', isNew:false,
+  desc:'Glowing embers drift up through a soft halo around the performer, twinkling as they rise. Kicks brighten them.',
+  params:[['Reach',.75],['Ember size',.35],['Rise speed',.45],['Density',.7],['Hue',.06],['Darken background',.5],['Halo glow',.5],['Key',.25]],
+  glsl: AURA_LIB + `
+vec3 fx(vec2 uv){
+  KEYED=isKeyed();
+  vec2 A=aspect();vec2 p=(uv-.5)*A;float k=kick();float key=uP7*.5;
+  float M=matte(uv,0.,key);
+  float F=field(uv,key,uP0);
+  vec3 s=src(uv).rgb;
+  vec3 col=s*mix(1.,.35,uP5)*(1.-M)+s*M;
+  vec3 gl=vec3(0.);
+  for(int j=0;j<3;j++){
+    float fj=float(j);float S=mix(28.,60.,fj*.5)*mix(1.5,.6,uP1);
+    vec2 q=p*S-vec2(0.,uTime*S*mix(.03,.15,uP2)*(1.+fj*.3));
+    vec2 id=floor(q);vec2 f=fract(q)-.5;
+    float h=h21(id+fj*17.);
+    f.x+=sin(uTime*2.+h*30.)*.2;
+    f-=(h22(id+fj*5.)-.5)*.5;
+    float alive=step(1.-mix(.15,.6,uP3),h);
+    float tw=.6+.4*sin(uTime*(4.+h*8.)+h*40.);
+    float d=length(f);
+    gl+=hsv(uP4+h*.12,.8,1.)*(smoothstep(.12,0.,d)*1.2+exp(-d*8.)*.25)*alive*tw;
+  }
+  float zone=smoothstep(.05,.6,F)*(1.-M);
+  return col+gl*zone*(1.+k*.8)+hsv(uP4,.8,1.)*F*(1.-M)*uP6*.3;
+}`},
+{ id:'aura-rings', name:'Aura · Rings', cat:'Aura', isNew:false,
+  desc:'Outline-shaped rings ripple outward from the performer like sonar, with a bright shock ring on every beat.',
+  params:[['Reach',.65],['Ring count',.45],['Speed',.4],['Thickness',.35],['Hue',.55],['Rainbow',.5],['Darken background',.5],['Key',.25]],
+  glsl: AURA_LIB + `
+vec3 fx(vec2 uv){
+  KEYED=isKeyed();
+  vec2 A=aspect();vec2 p=(uv-.5)*A;float k=kick();float key=uP7*.5;
+  float M=matte(uv,0.,key);
+  float F=field(uv,key,uP0);
+  float n=mix(4.,14.,uP1);
+  float v=(1.-F)*n-uTime*mix(.2,2.,uP2);
+  float fw=fwidth(v)+1e-3;
+  float dist=abs(fract(v+.5)-.5);
+  float ring=smoothstep(fw*mix(1.,3.,uP3),0.,dist)*smoothstep(0.,.25,F)*(1.-M);
+  float bring=exp(-abs((1.-F)-uBeat*.9)/.02)*k*(1.-M)*smoothstep(0.,.2,F);
+  vec3 s=src(uv).rgb;
+  vec3 col=s*mix(1.,.3,uP6)*(1.-M)+s*M;
+  vec3 rc=hsv(uP4+floor(v)*.08*uP5+uTime*.02,.75,1.);
+  return col+rc*ring*1.3+vec3(1.)*bring*.9;
+}`},
+{ id:'aura-neon', name:'Aura · Neon Stroke', cat:'Aura', isNew:false,
+  desc:'Stacked neon outlines trace the performer at growing distances, each its own colour, breathing outward on the beat.',
+  params:[['Reach',.85],['Strokes',.65],['Thickness',.35],['Glow',.6],['Hue',.85],['Rainbow',.6],['Beat breathe',.6],['Key',.25]],
+  glsl: AURA_LIB + `
+vec3 fx(vec2 uv){
+  KEYED=isKeyed();
+  vec2 A=aspect();vec2 p=(uv-.5)*A;float k=kick();float key=uP7*.5;
+  float M=matte(uv,0.,key);
+  float F=field(uv,key,uP0);
+  vec3 s=src(uv).rgb;
+  vec3 col=s;
+  float cnt=floor(mix(1.,4.,uP1)+.5);
+  float fw=fwidth(F)+1e-4;
+  for(int i=0;i<4;i++){
+    float fi=float(i);if(fi>=cnt)break;
+    float Li=mix(.8,.1,fi/3.)-k*.06*uP6;
+    float d=abs(F-Li);
+    float st=smoothstep(fw*mix(1.,4.,uP2),0.,d)+exp(-d/(fw*8.+.01))*uP3*.5;
+    col+=hsv(uP4+fi*uP5*.15+uTime*.02,.75,1.)*st*(1.-M)*(1.+.4*k);
+  }
+  float fm=fwidth(M)+1e-4;
+  col+=vec3(1.)*smoothstep(fm*2.,0.,abs(M-.5))*.6;
+  return col;
+}`},
+{ id:'aura-ghost', name:'Aura · Ghost Trail', cat:'Aura', isNew:false, hist:true,
+  desc:'Coloured ghost silhouettes from the last moments trail behind the performer, so every move leaves a spectral echo.',
+  params:[['Ghosts',.6],['Spacing',.5],['Drift',.85],['Rainbow',.6],['Hue',.75],['Darken background',.5],['Ghost opacity',.75],['Key',.25]],
+  glsl: AURA_LIB + `
+vec4 hist4(vec2 uv,float age){age=clamp(age,0.,HN-2.);float l=mod(uHead-floor(age)+HN,HN);return texture(uHist,vec3(uv,l));}
+vec3 fx(vec2 uv){
+  KEYED=isKeyed();
+  vec2 A=aspect();float key=uP7*.5;
+  float M=matte(uv,0.,key);
+  vec3 s=src(uv).rgb;
+  vec3 col=s*mix(1.,.35,uP5)*(1.-M);
+  float n=floor(mix(2.,6.,uP0)+.5);
+  vec2 drift=vec2(mix(-.008,.008,uP2),0.);
+  for(int jj=6;jj>=1;jj--){
+    float fj=float(jj);if(fj>n)continue;
+    vec4 h=hist4(uv-drift*fj,fj*mix(2.,8.,uP1));
+    float m=h.a*mix(smoothstep(key,key+.12,luma(h.rgb)),1.,KEYED);
+    vec3 gc=hsv(uP4+fj*uP3*.15,.8,1.);
+    col=mix(col,col*.4+gc*(.5+.5*luma(h.rgb)),m*(1.-fj/(n+1.))*uP6);
+  }
+  return mix(col,s,M);
+}`},
+{ id:'aura-radiance', name:'Aura · Radiance', cat:'Aura', isNew:false,
+  desc:'Shafts of light burst outward from behind the performer, a heavenly walk-on glow with a shimmer in the rays.',
+  params:[['Ray length',.55],['Shimmer',.4],['Hue',.12],['Saturation',.4],['Darken background',.5],['Centre height',.6],['Intensity',.6],['Key',.25]],
+  glsl: AURA_LIB + `
+vec3 fx(vec2 uv){
+  KEYED=isKeyed();
+  vec2 A=aspect();float k=kick();float key=uP7*.5;
+  float M=matte(uv,0.,key);
+  vec2 c=vec2(.5,mix(.3,.8,uP5));
+  vec2 dir=uv-c;
+  float j=h21(uv*uRes+fract(uTime)*17.);
+  float acc=0.;
+  for(int i=0;i<32;i++){float t=(float(i)+j)/32.;acc+=matte(uv-dir*t*mix(.2,.9,uP0),1.5,key)*(1.-t);}
+  acc/=16.;
+  float ang=atan(dir.y,dir.x*A.x);
+  float streak=.55+.45*vnoise(vec2(ang*24.,uTime*mix(.2,2.,uP1)));
+  vec3 s=src(uv).rgb;
+  vec3 col=s*mix(1.,.3,uP4)*(1.-M)+s*M;
+  return col+hsv(uP2,.6*uP3,1.)*acc*(1.-M*.7)*streak*mix(.4,1.8,uP6)*(1.+.5*k);
+}`},
+{ id:'tr-liquid', name:'Liquid Wipe', cat:'Transitions', isNew:true, trans:true,
+  desc:'B floods in behind an organic liquid front with a glowing rim that bends both pictures as it passes. Set any angle.',
+  params:[['Duration (beats)',.5],['Hold (beats)',.5],['Angle',.0],['Turbulence',.5],['Rim glow',.5],['Rim colour',0]],
+  glsl: TRANS_LIB + `
+vec3 fx(vec2 uv){
+  float pr=ease3(tprog());vec2 A=aspect();vec2 p=(uv-.5)*A;
+  float ang=uP2*TAU;vec2 dir=vec2(cos(ang),sin(ang));
+  float x=dot(p,dir)/(abs(dir.x)*A.x*.5+abs(dir.y)*.5);
+  float n=((vnoise(p*1.6+uTime*.3)-.5)*.65+(vnoise(p*3.2-uTime*.45)-.5)*.3)*mix(.15,1.,uP3);
+  float m=x+n-mix(-1.35,1.35,pr);
+  float px=2./uRes.y;
+  float aB=smoothstep(px,-px,m);
+  vec2 g=vec2(dFdx(m),dFdy(m));vec2 nr=g/(length(g)+1e-5);
+  float wdt=mix(.006,.025,uP4);
+  float rim=exp(-abs(m)/wdt);
+  float lens=smoothstep(wdt*3.,0.,abs(m));
+  vec3 a=TA(uv+nr*lens*.02).rgb,b=TB(uv-nr*lens*.02).rgb;
+  vec3 rc=uP5<.02?vec3(1.):hsv(uP5,.6,1.);
+  float gloss=pow(rim,6.)*1.2+rim*.35;
+  return mix(a,b,aB)*(1.+lens*.25)+rc*(gloss+exp(-abs(m)/.07)*.12);
+}`},
+{ id:'tr-flash', name:'Flash Burn', cat:'Transitions', isNew:true, trans:true,
+  desc:'A blows out into a bright overexposed flash with bloom and lens streaks, and B emerges from the light. The classic keynote reveal, turned up.',
+  params:[['Duration (beats)',.35],['Hold (beats)',.5],['Warm ↔ cool',.35],['Streaks',.6],['Bloom',.6],['Peak',.6]],
+  glsl: TRANS_LIB + `
+vec3 fx(vec2 uv){
+  float pr=tprog();
+  float f=pow(sin(pr*PI),1.5)*mix(.6,1.6,uP5);
+  float sw=smoothstep(.42,.58,pr);
+  vec3 base=mix(TA(uv).rgb,TB(uv).rgb,sw);
+  vec3 bl=mix(TAl(uv,4.).rgb,TBl(uv,4.).rgb,sw);
+  vec3 col=base*(1.+f*2.5)+bl*f*mix(.5,2.,uP4);
+  vec3 st=vec3(0.);
+  for(int i=-12;i<=12;i++){float fi=float(i)/12.;vec2 o=vec2(fi*.3,0.);
+    st+=max(mix(TAl(uv+o,3.).rgb,TBl(uv+o,3.).rgb,sw)-.45,0.)*exp(-abs(fi)*3.);}
+  vec3 tint=mix(vec3(1.,.85,.68),vec3(.75,.86,1.),uP2);
+  col+=st*f*uP3*.35*tint;
+  return mix(col,tint,clamp(f*.55,0.,1.));
+}`},
+{ id:'tr-whip', name:'Whip Zoom', cat:'Transitions', isNew:true, trans:true,
+  desc:'A rockets into the screen with radial blur, a twist and colour split, and B whips back out of it. Punchy for drops.',
+  params:[['Duration (beats)',.2],['Hold (beats)',.5],['Zoom',.6],['RGB split',.6],['Twist',.5],['Flash',.5]],
+  glsl: TRANS_LIB + `
+vec3 fx(vec2 uv){
+  float pr=ease3(tprog());vec2 A=aspect();vec2 p=(uv-.5)*A;
+  bool first=pr<.5;
+  float h=first?pr*2.:(1.-pr)*2.;
+  float z=1.+h*h*mix(1.,6.,uP2);
+  float ra=h*h*uP4*.8*(first?1.:-1.);
+  float sp=h*uP3*.08;
+  vec3 col=vec3(0.);
+  for(int i=0;i<16;i++){
+    float t=float(i)/15.;
+    float s=z*(1.+t*h*.35);
+    vec2 q=rot(ra*(1.+t*.25))*p;
+    vec2 ur=q/(s*(1.-sp))/A+.5,ug=q/s/A+.5,ub=q/(s*(1.+sp))/A+.5;
+    col+=first?vec3(TA(ur).r,TA(ug).g,TA(ub).b):vec3(TB(ur).r,TB(ug).g,TB(ub).b);
+  }
+  col/=16.;
+  return col+vec3(1.)*exp(-abs(pr-.5)*30.)*uP5*.8;
+}`},
+{ id:'tr-slices', name:'Slice Slide', cat:'Transitions', isNew:true, trans:true,
+  desc:'The frame splits into strips that slide away in alternating directions with a staggered, eased motion and motion blur, carrying B in behind them.',
+  params:[['Duration (beats)',.35],['Hold (beats)',.5],['Slices',.35],['Horizontal',0],['Stagger',.6],['Seam glow',.5]],
+  glsl: TRANS_LIB + `
+vec3 pickAB(float u,float o,float sh,float ds,bool hor){
+  float uA=u-sh,uB=u-sh+ds;
+  vec2 c=hor?vec2(uA,o):vec2(o,uA);
+  if(uA>=0.&&uA<=1.)return TA(c).rgb;
+  vec2 cb=hor?vec2(uB,o):vec2(o,uB);
+  return TB(cb).rgb;
+}
+vec3 fx(vec2 uv){
+  float pr=tprog();
+  bool hor=uP3>.5;
+  float u=hor?uv.x:uv.y,o=hor?uv.y:uv.x;
+  float n=floor(mix(3.,12.,uP2));
+  float idx=floor(o*n);
+  float st=mix(0.,.6,uP4);
+  float pi=clamp((pr-idx/max(n-1.,1.)*st)/(1.-st),0.,1.);
+  float e=pi<.5?4.*pi*pi*pi:1.-pow(-2.*pi+2.,3.)/2.;
+  float ds=mod(idx,2.)<.5?1.:-1.;
+  float sh=e*ds;
+  float e2=clamp(pi+.04,0.,1.);e2=e2<.5?4.*e2*e2*e2:1.-pow(-2.*e2+2.,3.)/2.;
+  float vel=(e2-e)*ds;
+  vec3 col=vec3(0.);
+  for(int i=0;i<6;i++){col+=pickAB(u+vel*float(i)/5.*.6,o,sh,ds,hor);}
+  col/=6.;
+  float uA=u-sh;
+  float seam=min(abs(uA),abs(uA-1.));
+  float px=1.5/(hor?uRes.x:uRes.y);
+  float on=step(.001,pi)*step(pi,.999);
+  return col+vec3(1.)*(smoothstep(px,0.,seam)*.9+exp(-seam/.01)*.25)*on*uP5;
+}`},
+{ id:'tr-smoke', name:'Smoke Reveal', cat:'Transitions', isNew:true, trans:true,
+  desc:'A dissolves into rising smoke and B forms out of it, with soft lit wisps along the edge.',
+  params:[['Duration (beats)',.6],['Hold (beats)',.5],['Detail',.4],['Softness',.45],['Smoke tint',.58],['Turbulence',.6]],
+  glsl: TRANS_LIB + `
+vec3 fx(vec2 uv){
+  float pr=tprog();vec2 A=aspect();vec2 p=(uv-.5)*A;
+  float sc=mix(1.,4.,uP2);
+  vec2 q=p*sc+vec2(0.,-uTime*.25);
+  vec2 w=vec2(fbm(q+uTime*.1),fbm(q+vec2(3.1,7.7)-uTime*.08));
+  float f=fbm(q+(w-.5)*mix(1.,5.,uP5))*.6+(.5-p.y)*.4;
+  float m=f-(1.-mix(-.1,1.15,pr));
+  float soft=mix(.02,.22,uP3);
+  float rv=smoothstep(-soft,soft,m);
+  float wisp=exp(-abs(m)/(soft*.7))*(.5+.6*fbm(q*3.))*step(.001,pr)*step(pr,.999);
+  vec3 a=TA(uv+vec2(0.,wisp*.012)).rgb,b=TB(uv).rgb;
+  return mix(a,b,rv)+hsv(uP4,.25,1.)*wisp*.4;
+}`},
+{ id:'tr-stream', name:'Pixel Stream', cat:'Transitions', isNew:true, trans:true,
+  desc:'Rows of A smear sideways into pixel-sorted streaks at random times, and B is left behind as they rush off. Clean digital chaos.',
+  params:[['Duration (beats)',.5],['Hold (beats)',.5],['Row size',.4],['Streak length',.5],['Glitch colour',.5],['Right to left',0]],
+  glsl: TRANS_LIB + `
+vec3 fx(vec2 uv){
+  float pr=tprog();
+  float x=uP5>.5?1.-uv.x:uv.x;
+  float rows=floor(mix(120.,16.,uP2));
+  float row=floor(uv.y*rows);
+  float big=floor(uv.y*rows*.25);
+  float r=h11(row*1.37)*.6+h11(big*3.1)*.4;
+  float t=clamp(pr*1.7-r*.7,0.,1.);
+  t=t*t*(3.-2.*t);
+  float len=mix(.1,.6,uP3)*(.5+h11(row*7.7));
+  float front=t*(1.+len);
+  float ux=uP5>.5?1.-x:x;
+  vec3 col;
+  if(x<front-len)col=TB(uv).rgb;
+  else if(x<front){
+    float sx=front-len;float sxu=uP5>.5?1.-sx:sx;
+    float k=(x-(front-len))/max(len,1e-4);
+    vec3 c=TA(vec2(sxu,uv.y)).rgb;
+    col=mix(TB(uv).rgb,c*(1.2+.5*k),smoothstep(0.,.15,k));
+    col+=hsv(uP4+r,.8,1.)*k*k*.35*uP4;
+  }
+  else col=TA(vec2(ux,uv.y)).rgb;
+  return col;
+}`},
+{ id:'tr-iris', name:'Halo Iris', cat:'Transitions', isNew:true, trans:true,
+  desc:'B opens out of the centre inside an expanding ring of light that wobbles like liquid and bends both pictures at its edge.',
+  params:[['Duration (beats)',.5],['Hold (beats)',.5],['Ring glow',.6],['Refraction',.5],['Ring colour',0],['Wobble',.4]],
+  glsl: TRANS_LIB + `
+vec3 fx(vec2 uv){
+  float pr=ease3(tprog());vec2 A=aspect();vec2 p=(uv-.5)*A;
+  float a=atan(p.y,p.x);
+  float R=pr*length(A*.5)*1.08;
+  float wob=(fbm(vec2(cos(a),sin(a))*2.+uTime*.6)-.5)*.12*uP5*sin(pr*PI);
+  float d=length(p)-R-wob;
+  float px=2./uRes.y;
+  float aB=smoothstep(px,-px,d);
+  vec2 nr=p/(length(p)+1e-5);
+  float rim=exp(-abs(d)/mix(.004,.02,uP2))*step(.001,pr)*step(pr,.999);
+  vec3 a2=TA(uv+nr*rim*.02*uP3).rgb,b=TB(uv-nr*rim*.02*uP3).rgb;
+  vec3 rc=uP4<.02?vec3(1.):hsv(uP4,.6,1.);
+  float echo=exp(-abs(d+.05)/.008)*.3*step(.001,pr)*step(pr,.999);
+  return mix(a2,b,aB)+rc*(rim*1.1+echo+exp(-abs(d)/.08)*.12*rim);
+}`},
+{ id:'tr-cube', name:'Cube Turn', cat:'Transitions', isNew:true, trans:true,
+  desc:'A and B on two faces of a 3D cube that swings round, pulling back mid-turn so you feel the depth, with light falling across the faces.',
+  params:[['Duration (beats)',.35],['Hold (beats)',.5],['Pull back',.5],['Turn left',0],['Edge light',.5],['Background',.1]],
+  glsl: TRANS_LIB + `
+vec2 boxHitT(vec3 ro,vec3 rd,vec3 b,out vec3 n){
+  vec3 m=1./rd;vec3 nn=m*ro;vec3 k=abs(m)*b;vec3 t1=-nn-k,t2=-nn+k;
+  float tN=max(max(t1.x,t1.y),t1.z);float tF=min(min(t2.x,t2.y),t2.z);
+  n=vec3(0.);if(tN>tF||tF<0.)return vec2(-1.);
+  n=-sign(rd)*step(t1.yzx,t1.xyz)*step(t1.zxy,t1.xyz);return vec2(tN,tF);
+}
+vec3 fx(vec2 uv){
+  float pr=tprog();float e=pr<.5?4.*pr*pr*pr:1.-pow(-2.*pr+2.,3.)/2.;
+  vec2 A=aspect();vec2 p=(uv-.5)*A;
+  float sgn=uP3>.5?-1.:1.;
+  float th=e*PI*.5*sgn;
+  vec3 hb=vec3(A.x*.5,.5,A.x*.5);
+  float D=hb.z+2.2+sin(pr*PI)*mix(0.,2.5,uP2);
+  float f=2.2;
+  vec3 ro=vec3(0.,0.,D);vec3 rd=normalize(vec3(p,-f));
+  float c=cos(th),s=sin(th);
+  mat3 Ry=mat3(c,0.,-s,0.,1.,0.,s,0.,c);
+  vec3 lro=Ry*ro,lrd=Ry*rd;vec3 n;
+  vec2 t=boxHitT(lro,lrd,hb,n);
+  vec3 col=(TAl(uv,5.).rgb*(1.-pr)+TBl(uv,5.).rgb*pr)*uP5;
+  if(t.x>0.){
+    vec3 h=lro+lrd*t.x;
+    vec3 fc;float shade;
+    if(n.z>.5){fc=TA(vec2(h.x/A.x+.5,h.y+.5)).rgb;shade=abs(c);}
+    else if(n.x*sgn>.5){fc=TB(vec2(-h.z*sgn/A.x+.5,h.y+.5)).rgb;shade=abs(s);}
+    else{fc=vec3(.02);shade=.5;}
+    vec3 a=abs(h)/hb;float mid=a.x+a.y+a.z-max(a.x,max(a.y,a.z))-min(a.x,min(a.y,a.z));
+    col=fc*(.35+.65*shade)+vec3(1.)*exp(-(1.-mid)*hb.y/.006)*uP4*sin(pr*PI);
+  }
+  return col;
+}`},
+{ id:'tr-luma', name:'Light Dissolve', cat:'Transitions', isNew:true, trans:true,
+  desc:'B burns through A starting from the brightest parts (or the darkest), with a glowing line of light tracing the dissolve.',
+  params:[['Duration (beats)',.6],['Hold (beats)',.5],['Edge glow',.8],['Edge colour',.1],['Darks first',0],['Softness',.3]],
+  glsl: TRANS_LIB + `
+vec3 fx(vec2 uv){
+  float pr=tprog();vec2 A=aspect();vec2 p=(uv-.5)*A;
+  vec3 a=TA(uv).rgb,b=TB(uv).rgb;
+  float l=sqrt(clamp(luma(TAl(uv,1.).rgb)*1.4,0.,1.));
+  if(uP4>.5)l=1.-l;
+  float m=l+(fbm(p*6.+uTime*.1)-.5)*.25-(1.-mix(-.2,1.25,pr));
+  float soft=mix(.005,.08,uP5);
+  float aB=smoothstep(-soft,soft,m);
+  float gl=exp(-abs(m)/mix(.01,.04,uP2))*step(.001,pr)*step(pr,.999);
+  vec3 ec=uP3<.02?vec3(1.):hsv(uP3,.7,1.);
+  return mix(a,b,aB)+ec*gl*uP2*1.4;
+}`},
+{ id:'tr-rgb', name:'Spectrum Split', cat:'Transitions', isNew:true, trans:true,
+  desc:'Red, green and blue tear apart in three directions, each swapping from A to B at its own moment, then snap back together on B.',
+  params:[['Duration (beats)',.35],['Hold (beats)',.5],['Spread',.6],['Angle',.1],['Smear',.5],['Flash',.4]],
+  glsl: TRANS_LIB + `
+vec3 fx(vec2 uv){
+  float pr=tprog();
+  float h=sin(pr*PI);h*=h;
+  float sp=h*mix(.02,.15,uP2);
+  float a0=uP3*TAU;
+  vec2 oR=vec2(cos(a0),sin(a0))*sp,oG=vec2(cos(a0+2.094),sin(a0+2.094))*sp,oB=vec2(cos(a0+4.189),sin(a0+4.189))*sp;
+  vec3 col=vec3(0.);
+  for(int i=0;i<6;i++){
+    float t=1.-float(i)/5.*uP4;
+    col.r+=mix(TA(uv+oR*t).r,TB(uv+oR*t).r,smoothstep(.32,.44,pr));
+    col.g+=mix(TA(uv+oG*t).g,TB(uv+oG*t).g,smoothstep(.44,.56,pr));
+    col.b+=mix(TA(uv+oB*t).b,TB(uv+oB*t).b,smoothstep(.56,.68,pr));
+  }
+  col/=6.;
+  return col+vec3(1.)*exp(-abs(pr-.5)*20.)*uP5*.4;
+}`}
+];
+const CAT_ORDER=['Pinnacle','Aura','Transitions','Borders','Overlays','Masks','Type','Stylize','Feedback','Time'];
+EFFECTS.sort((a,b)=>CAT_ORDER.indexOf(a.cat)-CAT_ORDER.indexOf(b.cat));
+
+/* ---------- GL setup ---------- */
+const canvas = document.getElementById('out');
+const errBox = document.getElementById('err');
+const errors = [];
+function showErr(msg){ errors.push(msg); errBox.textContent = msg; errBox.hidden = false; console.error(msg); }
+
+const gl = canvas.getContext('webgl2', { antialias:false, alpha:false, premultipliedAlpha:false, powerPreference:'high-performance' });
+if (!gl) { showErr('This browser could not start WebGL2, which the preview needs. Try a recent Chrome, Edge, Firefox or Safari.'); return; }
+const hasFloat = !!gl.getExtension('EXT_color_buffer_float');
+
+const VS = `#version 300 es
+in vec2 aPos;out vec2 vUv;void main(){vUv=aPos*.5+.5;gl_Position=vec4(aPos,0.,1.);}`;
+const vbo = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
+
+function sh(type, srcText){
+  const s = gl.createShader(type); gl.shaderSource(s, srcText); gl.compileShader(s);
+  if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) { const log = gl.getShaderInfoLog(s); gl.deleteShader(s); throw new Error(log); }
+  return s;
+}
+const UNIFORMS = ['uSrc','uPrev','uText','uClip','uRes','uTime','uBeat','uBeats','uClipAspect','uP0','uP1','uP2','uP3','uP4','uP5','uHist','uHead','uGlyph','uP6','uP7','uFPB','uSrc2'];
+const cache = new Map();
+function program(key, body){
+  if (cache.has(key)) return cache.get(key);
+  let prog = null;
+  try {
+    const p = gl.createProgram();
+    gl.attachShader(p, sh(gl.VERTEX_SHADER, VS));
+    gl.attachShader(p, sh(gl.FRAGMENT_SHADER, PRELUDE + body + MAIN));
+    gl.bindAttribLocation(p, 0, 'aPos');
+    gl.linkProgram(p);
+    if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p));
+    const loc = {}; UNIFORMS.forEach(u => loc[u] = gl.getUniformLocation(p, u));
+    prog = { p, loc };
+  } catch (e) { showErr('Shader "' + key + '" failed to compile:\n' + e.message); }
+  cache.set(key, prog);
+  return prog;
+}
+
+function tex(opts){
+  const t = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, t);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, opts.mip ? gl.LINEAR_MIPMAP_LINEAR : gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, opts.wrap);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, opts.wrap);
+  return t;
+}
+function alloc(t, w, h, float){
+  gl.bindTexture(gl.TEXTURE_2D, t);
+  if (float) gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, w, h, 0, gl.RGBA, gl.HALF_FLOAT, null);
+  else gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+}
+function fbo(t){ const f = gl.createFramebuffer(); gl.bindFramebuffer(gl.FRAMEBUFFER, f); gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, t, 0); return f; }
+
+const srcTex = tex({ mip:true, wrap:gl.MIRRORED_REPEAT });
+const srcTex2 = tex({ mip:true, wrap:gl.MIRRORED_REPEAT });
+let srcFbo2 = null;
+const outTex = [tex({ wrap:gl.CLAMP_TO_EDGE }), tex({ wrap:gl.CLAMP_TO_EDGE })];
+let srcFbo = null, outFbo = [null, null];
+let W = 0, H = 0;
+
+const HN = 48; let histTex = null, histW = 0, histH = 0, head = 0;
+const histFbo = gl.createFramebuffer();
+function allocHist(w, h){
+  if (histTex) gl.deleteTexture(histTex);
+  histW = Math.min(w, 768); histH = Math.max(2, Math.round(histW * h / w));
+  histTex = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D_ARRAY, histTex);
+  gl.texStorage3D(gl.TEXTURE_2D_ARRAY, 1, gl.RGBA8, histW, histH, HN);
+  gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  head = 0;
+}
+function pushHist(){
+  head = (head + 1) % HN;
+  gl.bindFramebuffer(gl.READ_FRAMEBUFFER, srcFbo);
+  gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, histFbo);
+  gl.framebufferTextureLayer(gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, histTex, 0, head);
+  gl.blitFramebuffer(0, 0, W, H, 0, 0, histW, histH, gl.COLOR_BUFFER_BIT, gl.LINEAR);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+}
+function allocTargets(w, h){
+  W = w; H = h;
+  allocHist(w, h);
+  alloc(srcTex, w, h, false);
+  alloc(srcTex2, w, h, false);
+  if (srcFbo2) gl.deleteFramebuffer(srcFbo2);
+  srcFbo2 = fbo(srcTex2);
+  outTex.forEach(t => alloc(t, w, h, hasFloat));
+  [srcFbo, ...outFbo].forEach(f => f && gl.deleteFramebuffer(f));
+  srcFbo = fbo(srcTex);
+  outFbo = [fbo(outTex[0]), fbo(outTex[1])];
+  clearFeedback();
+}
+function clearFeedback(){
+  outFbo.forEach(f => { if (!f) return; gl.bindFramebuffer(gl.FRAMEBUFFER, f); gl.clearColor(0,0,0,0); gl.clear(gl.COLOR_BUFFER_BIT); });
+}
+
+/* text texture */
+const textTex = tex({ mip:true, wrap:gl.REPEAT });
+const tcan = document.createElement('canvas'); tcan.width = 2048; tcan.height = 512;
+function drawWord(word){
+  const c = tcan.getContext('2d');
+  c.fillStyle = '#000'; c.fillRect(0, 0, 2048, 512);
+  c.fillStyle = '#fff'; c.textAlign = 'center'; c.textBaseline = 'middle';
+  const w = (word || ' ').toUpperCase();
+  let size = 400;
+  c.font = `900 ${size}px Unbounded, "Arial Black", Impact, sans-serif`;
+  const mw = c.measureText(w).width;
+  if (mw > 1880) { size = Math.floor(size * 1880 / mw); c.font = `900 ${size}px Unbounded, "Arial Black", Impact, sans-serif`; }
+  c.fillText(w, 1024, 272);
+  gl.bindTexture(gl.TEXTURE_2D, textTex);
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, tcan);
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+  gl.generateMipmap(gl.TEXTURE_2D);
+}
+
+/* glyph atlas for ASCII: 16 glyphs ordered by ink density */
+const glyphTex = tex({ wrap:gl.CLAMP_TO_EDGE });
+function drawGlyphs(){
+  const gc = document.createElement('canvas'); gc.width = 640; gc.height = 64;
+  const c = gc.getContext('2d');
+  c.fillStyle = '#000'; c.fillRect(0, 0, 640, 64);
+  c.fillStyle = '#fff'; c.textAlign = 'center'; c.textBaseline = 'middle';
+  c.font = '500 50px "JetBrains Mono", ui-monospace, Menlo, monospace';
+  const G = [' ', '.', ',', ':', '-', '=', '+', '*', 'o', 'x', 'O', '0', '#', '%', '@', '\u2588'];
+  G.forEach((g, i) => { if (i === 15) c.fillRect(i * 40 + 3, 6, 34, 52); else c.fillText(g, i * 40 + 20, 34); });
+  gl.bindTexture(gl.TEXTURE_2D, glyphTex);
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, gc);
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+}
+
+/* clip texture */
+const clipTex = tex({ wrap:gl.CLAMP_TO_EDGE });
+gl.bindTexture(gl.TEXTURE_2D, clipTex);
+gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0,0,0,255]));
+let clip = null, clipAspect = 16/9;
+function uploadClip(el){
+  gl.bindTexture(gl.TEXTURE_2D, clipTex);
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, el);
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+}
+
+/* ---------- state ---------- */
+const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const state = {
+  fx: 0, src: 'stage', bpm: 124, origin: 0, clock: 0, paused: reduceMotion, bypass: false, reel: false, reelStart: 0,
+  params: Object.fromEntries(EFFECTS.map(e => [e.id, e.params.map(p => p[1])]))
+};
+const beatsNow = () => (state.clock - state.origin) * state.bpm / 60;
+
+/* ---------- UI ---------- */
+const $ = id => document.getElementById(id);
+const list = $('fxlist');
+const cats = [...new Set(EFFECTS.map(e => e.cat))];
+const fxButtons = [];
+cats.forEach(cat => {
+  const row = document.createElement('div'); row.className = 'cat';
+  const h = document.createElement('h3'); h.textContent = cat; row.appendChild(h);
+  const chips = document.createElement('div'); chips.className = 'chips';
+  EFFECTS.forEach((e, i) => {
+    if (e.cat !== cat) return;
+    const b = document.createElement('button'); b.id = 'fx-' + e.id; b.textContent = e.name; b.setAttribute('aria-pressed', 'false');
+    if (e.isNew) { const nb = document.createElement('span'); nb.className = 'new'; nb.textContent = 'new'; b.appendChild(nb); }
+    b.addEventListener('click', () => select(i));
+    fxButtons[i] = b; chips.appendChild(b);
+  });
+  row.appendChild(chips); list.appendChild(row);
+});
+$('meta').textContent = EFFECTS.length + ' effects · ' + cats.length + ' categories';
+
+function renderSliders(){
+  const e = EFFECTS[state.fx]; const vals = state.params[e.id];
+  const box = $('sliders'); box.innerHTML = '';
+  e.params.forEach((p, i) => {
+    const wrap = document.createElement('div'); wrap.className = 'slider';
+    const id = 'p-' + e.id + '-' + i;
+    const lab = document.createElement('label'); lab.htmlFor = id; lab.textContent = p[0];
+    const out = document.createElement('output'); out.htmlFor = id; out.textContent = vals[i].toFixed(2);
+    const inp = document.createElement('input'); inp.type = 'range'; inp.min = 0; inp.max = 1; inp.step = 0.001; inp.value = vals[i]; inp.id = id;
+    inp.addEventListener('input', () => { vals[i] = parseFloat(inp.value); out.textContent = vals[i].toFixed(2); });
+    wrap.append(lab, out, inp); box.appendChild(wrap);
+  });
+}
+function select(i){
+  state.fx = (i + EFFECTS.length) % EFFECTS.length;
+  const e = EFFECTS[state.fx];
+  fxButtons.forEach((b, j) => b.setAttribute('aria-pressed', j === state.fx ? 'true' : 'false'));
+  $('pName').textContent = e.name; $('pDesc').textContent = e.desc;
+  $('osdName').textContent = e.name; $('osdCat').textContent = e.cat;
+  renderSliders(); clearFeedback();
+  state.reelStart = Math.floor(beatsNow());
+}
+function setSource(s){
+  if (s === 'clip' && !clip) { $('clipFile').click(); return; }
+  state.src = s;
+  ['loop','type','stage','clip'].forEach(k => $('src' + k[0].toUpperCase() + k.slice(1)).setAttribute('aria-pressed', k === s ? 'true' : 'false'));
+  clearFeedback();
+}
+$('srcSeg').addEventListener('click', ev => { const b = ev.target.closest('button'); if (!b) return; if (b.dataset.src === 'clip' && clip && state.src === 'clip') { $('clipFile').click(); return; } setSource(b.dataset.src); });
+$('clipFile').addEventListener('change', ev => {
+  const f = ev.target.files && ev.target.files[0]; if (!f) return;
+  const url = URL.createObjectURL(f);
+  if (f.type.startsWith('video')) {
+    const v = document.createElement('video'); v.muted = true; v.loop = true; v.playsInline = true; v.src = url;
+    v.addEventListener('loadeddata', () => { clip = { el:v, video:true }; clipAspect = v.videoWidth / v.videoHeight || 16/9; $('srcClip').textContent = 'Your clip'; setSource('clip'); }, { once:true });
+    v.play().catch(() => {});
+  } else {
+    const img = new Image();
+    img.onload = () => { clip = { el:img, video:false }; clipAspect = img.naturalWidth / img.naturalHeight || 16/9; uploadClip(img); $('srcClip').textContent = 'Your clip'; setSource('clip'); };
+    img.src = url;
+  }
+});
+$('bpm').addEventListener('change', () => {
+  const v = Math.min(220, Math.max(40, parseFloat($('bpm').value) || 124));
+  const b = beatsNow(); state.bpm = v; state.origin = state.clock - b * 60 / v; $('bpm').value = v;
+});
+let taps = [];
+function tap(){
+  const t = state.clock;
+  if (taps.length && t - taps[taps.length - 1] > 2) taps = [];
+  taps.push(t); if (taps.length > 5) taps.shift();
+  if (taps.length >= 2) {
+    const iv = (taps[taps.length - 1] - taps[0]) / (taps.length - 1);
+    state.bpm = Math.min(220, Math.max(40, Math.round(600 / iv) / 10)); $('bpm').value = state.bpm;
+  }
+  state.origin = t;
+}
+$('tap').addEventListener('click', tap);
+$('word').addEventListener('input', () => drawWord($('word').value.trim() || 'PULSE'));
+const bypassBtn = $('bypass');
+function setBypass(on){ state.bypass = on; bypassBtn.setAttribute('aria-pressed', on ? 'true' : 'false'); $('osdBypass').hidden = !on; }
+bypassBtn.addEventListener('pointerdown', () => setBypass(true));
+['pointerup','pointerleave','pointercancel'].forEach(ev => bypassBtn.addEventListener(ev, () => setBypass(false)));
+$('reel').addEventListener('click', () => { state.reel = !state.reel; $('reel').setAttribute('aria-pressed', String(state.reel)); state.reelStart = Math.floor(beatsNow()); });
+function setPaused(p){ state.paused = p; $('pause').setAttribute('aria-pressed', String(p)); $('pause').textContent = p ? 'Play' : 'Pause'; }
+$('pause').addEventListener('click', () => setPaused(!state.paused));
+$('fs').addEventListener('click', () => { const m = $('monitor'); try { (document.fullscreenElement ? document.exitFullscreen() : m.requestFullscreen()).catch(() => {}); } catch (e) {} });
+$('reset').addEventListener('click', () => { const e = EFFECTS[state.fx]; state.params[e.id] = e.params.map(p => p[1]); renderSliders(); });
+document.addEventListener('keydown', ev => {
+  if (ev.target.closest && ev.target.closest('input')) return;
+  if (ev.key === 'ArrowRight') { select(state.fx + 1); ev.preventDefault(); }
+  else if (ev.key === 'ArrowLeft') { select(state.fx - 1); ev.preventDefault(); }
+  else if (ev.key === ' ') { tap(); ev.preventDefault(); }
+  else if ((ev.key === 'b' || ev.key === 'B') && !ev.repeat) setBypass(true);
+});
+document.addEventListener('keyup', ev => { if (ev.key === 'b' || ev.key === 'B') setBypass(false); });
+const dots = [...document.querySelectorAll('#beatDots i')];
+
+/* ---------- render ---------- */
+gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+gl.enableVertexAttribArray(0);
+gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+
+function draw(prog, target, srcT, prevT, params){
+  if (!prog) return false;
+  gl.bindFramebuffer(gl.FRAMEBUFFER, target);
+  gl.viewport(0, 0, W, H);
+  gl.useProgram(prog.p);
+  const L = prog.loc, b = beatsNow();
+  gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, srcT); gl.uniform1i(L.uSrc, 0);
+  gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, prevT); gl.uniform1i(L.uPrev, 1);
+  gl.activeTexture(gl.TEXTURE2); gl.bindTexture(gl.TEXTURE_2D, textTex); gl.uniform1i(L.uText, 2);
+  gl.activeTexture(gl.TEXTURE3); gl.bindTexture(gl.TEXTURE_2D, clipTex); gl.uniform1i(L.uClip, 3);
+  gl.activeTexture(gl.TEXTURE4); gl.bindTexture(gl.TEXTURE_2D_ARRAY, histTex); gl.uniform1i(L.uHist, 4);
+  gl.activeTexture(gl.TEXTURE5); gl.bindTexture(gl.TEXTURE_2D, glyphTex); gl.uniform1i(L.uGlyph, 5);
+  gl.uniform1f(L.uHead, head);
+  gl.activeTexture(gl.TEXTURE6); gl.bindTexture(gl.TEXTURE_2D, srcTex2); gl.uniform1i(L.uSrc2, 6);
+  gl.uniform2f(L.uRes, W, H);
+  gl.uniform1f(L.uTime, state.clock);
+  gl.uniform1f(L.uBeat, ((b % 1) + 1) % 1);
+  gl.uniform1f(L.uBeats, b);
+  gl.uniform1f(L.uClipAspect, clipAspect);
+  for (let i = 0; i < 8; i++) gl.uniform1f(L['uP' + i], params ? (params[i] ?? 0) : 0);
+  gl.uniform1f(L.uFPB, fpsS * 60 / state.bpm);
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+  return true;
+}
+
+let cur = 0, last = performance.now(), fpsS = 60;
+function resize(){
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  let w = Math.round(canvas.clientWidth * dpr), h = Math.round(canvas.clientHeight * dpr);
+  const s = Math.min(1, 3840 / Math.max(w, 1)); w = Math.max(2, Math.round(w * s)); h = Math.max(2, Math.round(h * s));
+  if (w !== canvas.width || h !== canvas.height || w !== W || h !== H) { canvas.width = w; canvas.height = h; allocTargets(w, h); }
+}
+
+function frame(now){
+  const dt = Math.min(0.1, (now - last) / 1000); last = now;
+  if (!state.paused) state.clock += dt;
+  if (dt > 0.001) fpsS += (Math.min(240, 1 / dt) - fpsS) * 0.05;
+  resize();
+  const b = beatsNow();
+  if (state.reel && Math.floor(b) - state.reelStart >= 16) select(state.fx + 1);
+  const bi = ((Math.floor(b) % 4) + 4) % 4;
+  dots.forEach((d, i) => { d.className = i === bi ? (i === 0 ? 'on down' : 'on') : ''; });
+
+  // 1. source
+  if (state.src === 'clip' && clip && clip.video && clip.el.readyState >= 2) uploadClip(clip.el);
+  draw(program('src:' + state.src, SOURCES[state.src]), srcFbo, null, null, null);
+  gl.bindTexture(gl.TEXTURE_2D, srcTex); gl.generateMipmap(gl.TEXTURE_2D);
+  pushHist();
+
+  // 2. effect (reads previous output for feedback)
+  const e = EFFECTS[state.fx];
+  if (e.trans) {
+    const PAIR = { stage:'loop', loop:'stage', type:'stage', clip:'stage' };
+    const b2 = PAIR[state.src] || 'loop';
+    draw(program('src:' + b2, SOURCES[b2]), srcFbo2, null, null, null);
+    gl.bindTexture(gl.TEXTURE_2D, srcTex2); gl.generateMipmap(gl.TEXTURE_2D);
+  }
+  const prog = state.bypass ? program('copy', COPY) : program('fx:' + e.id, e.glsl);
+  draw(prog, outFbo[cur], srcTex, outTex[1 - cur], state.params[e.id]);
+
+  // 3. present
+  draw(program('copy', COPY), null, outTex[cur], null, null);
+  cur = 1 - cur;
+  requestAnimationFrame(frame);
+}
+
+/* boot */
+select(0);
+setPaused(state.paused);
+drawWord('PULSE');
+drawGlyphs();
+if (document.fonts && document.fonts.load) {
+  document.fonts.load('900 200px Unbounded').then(() => drawWord($('word').value.trim() || 'PULSE')).catch(() => {});
+  document.fonts.load('500 50px "JetBrains Mono"').then(drawGlyphs).catch(() => {});
+}
+// warm up the rest of the shaders in idle time so switching is instant
+let warm = 0;
+function warmup(){
+  if (warm < EFFECTS.length) { program('fx:' + EFFECTS[warm].id, EFFECTS[warm].glsl); warm++; setTimeout(warmup, 60); }
+  else { program('src:type', SOURCES.type); }
+}
+setTimeout(warmup, 400);
+window.__lab = { select, setSource, effects: EFFECTS.map(e => e.id), errors, state, setClock: t => { state.clock = t; } };
+requestAnimationFrame(frame);
+})();
+</script>

@@ -1,0 +1,50 @@
+name: Build IMMINENCE for Windows
+
+on:
+  push:
+    branches: ['**']
+    paths-ignore: ['**.md', 'preview/**']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure (Visual Studio, 64-bit)
+        run: cmake -S . -B build -G "Visual Studio 17 2022" -A x64
+
+      - name: Build all plugins
+        run: cmake --build build --config Release --parallel
+
+      - name: Package
+        shell: pwsh
+        run: |
+          $dir = "dist/IMMINENCE"
+          New-Item -ItemType Directory -Force $dir | Out-Null
+          Copy-Item build/Release/IMMINENCE_*.dll $dir
+          Copy-Item docs/HOW-TO-INSTALL.txt $dir
+          $count = (Get-ChildItem $dir -Filter *.dll).Count
+          Write-Host "Packaged $count plugins"
+          if ($count -ne 25) { throw "Expected 25 plugins, got $count" }
+          Compress-Archive -Path $dir -DestinationPath dist/IMMINENCE-Windows.zip -Force
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: IMMINENCE-Windows
+          path: dist/IMMINENCE-Windows.zip
+
+      - name: Publish to Releases
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $tag = "v1.0.${{ github.run_number }}"
+          $ghArgs = @($tag, "dist/IMMINENCE-Windows.zip", "--target", "${{ github.sha }}",
+                    "--title", "IMMINENCE $tag", "--notes-file", "docs/RELEASE_NOTES.md")
+          if ("${{ github.ref_name }}" -ne "main") { $ghArgs += "--prerelease" }
+          gh release create @ghArgs
