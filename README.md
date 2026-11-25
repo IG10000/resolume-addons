@@ -159,7 +159,7 @@ external/                   Resolume FFGL SDK, GLEW, stb (with their licences)
 **Windows build** (what GitHub runs on every push, then publishes to Releases):
 
 ```
-cmake -S . -B build -G "Visual Studio 17 2022" -A x64
+cmake -S . -B build -A x64
 cmake --build build --config Release
 ```
 
