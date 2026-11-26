@@ -5,6 +5,7 @@ feedback, time effects and transitions. Every effect follows Arena's BPM.
 
 - **Download:** go to [Releases](../../releases), open the newest release, download **IMMINENCE-Windows.zip**.
 - **Every style and control:** [docs/CONTROLS.md](docs/CONTROLS.md)
+- **How to use the transitions (step by step):** [docs/TRANSITIONS.md](docs/TRANSITIONS.md)
 - **Try the looks in a browser first:** open [`preview/index.html`](preview/index.html) (download it and double-click).
 
 ---
