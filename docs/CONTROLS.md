@@ -1,6 +1,6 @@
 # Every IMMINENCE plugin, style and control
 
-Generated from the plugin tables. Every plugin also has **Beat punch** (how hard beat-synced moves hit; not on transitions), **Mix** (effects only: 0% = untouched clip, 100% = full effect), **Quality** (High / Medium / Low; lower is lighter on the graphics card) and **Unlock code**. Transitions also have **Opacity**, which Arena moves for you during a transition.
+Generated from the plugin tables. Every plugin also has **Beat punch** (how hard beat-synced moves hit; not on transitions), **Mix** (effects only: 0% = untouched clip, 100% = full effect), **Background** (sources only: See-through or Black), **Quality** (High / Medium / Low; lower is lighter on the graphics card) and **Unlock code**. Transitions also have **Opacity**, which Arena moves for you during a transition.
 
 ## IM Slice Trace
 
@@ -214,6 +214,56 @@ time effects built on a frame buffer.
   _Controls:_ Red delay, Green delay, Blue delay, Beat pump, Echo trails, Saturation
 - **Time Tiles**: Datamosh-style tiles, each replaying a different moment from the frame buffer, reshuffled on the beat.  
   _Controls:_ Tiles, Max delay, Amount, Split depth (None / Once / Twice / Three times), Borders, Shuffle (Every beat / 2 per beat / 4 per beat)
+
+## IM Slice Src
+
+IMMINENCE source: liquid light outlines for LED slices, on a see-through background.
+
+- **Liquid**: White light flows around each LED slice like liquid. Streaks stretch, taper, split and drain away unpredictably, thinning to fine tips.  
+  _Controls:_ Slices (1 / 2 / 3 / 4 / 5), Centre slice width, Inset, Corner radius, Amount of light, Flow speed, Thickness, Glow
+- **Mercury**: Liquid metal running around each slice: rounded silver beads that swell, merge and split, catching a moving highlight.  
+  _Controls:_ Slices (1 / 2 / 3 / 4 / 5), Centre slice width, Inset, Corner radius, Amount of light, Flow speed, Thickness, Shine
+- **Neon Liquid**: The same liquid flow in colour: streams of neon whose hue drifts along the outline, with a white-hot core and soft bloom.  
+  _Controls:_ Slices (1 / 2 / 3 / 4 / 5), Centre slice width, Inset, Corner radius, Amount of light, Flow speed, Hue, Colour spread
+- **Surge**: Calm liquid streaks until the beat hits: then a surge pours from the top of each slice and races down both sides before draining away.  
+  _Controls:_ Slices (1 / 2 / 3 / 4 / 5), Centre slice width, Inset, Corner radius, Amount of light, Surge strength, Surge speed, Glow
+- **Braid**: Two liquid streams, one white and one in an accent colour, weave over and under each other as they flow around every slice.  
+  _Controls:_ Slices (1 / 2 / 3 / 4 / 5), Centre slice width, Inset, Corner radius, Amount of light, Flow speed, Braid width, Accent hue
+- **Spill**: The liquid outline spills light into each slice: wherever a streak flows, a soft wash bleeds inward and ripples, then fades as the streak moves on.  
+  _Controls:_ Slices (1 / 2 / 3 / 4 / 5), Centre slice width, Inset, Corner radius, Amount of light, Flow speed, Spill depth, Tint (0 = white)
+
+## IM Halo Src
+
+IMMINENCE source: premium frames on a see-through background.
+
+- **Glass Frame**: A premium frosted-glass frame: the clip blurs into the glass band, a soft light glides along the inner edge, and the window casts a gentle shadow inward. Built for keynotes, award shows and concerts.  
+  _Controls:_ Width, Corner radius, Frost, Edge light, Glide speed, Hue, Tint, Beat breathe
+- **Aurora**: A fine line of light around the frame with aurora colours flowing along it and soft curtains drifting inward.  
+  _Controls:_ Inset, Corner radius, Flow speed, Hue, Curtain depth, Beat lift
+- **Corners**: Minimal broadcast framing: corner brackets that redraw every 4 bars, a hairline frame, ruler ticks, centre marks and a light that travels the edge.  
+  _Controls:_ Inset, Bracket length, Thickness, Detail lines, Hue, Colour amount, Beat pulse
+
+## IM Borders Src
+
+IMMINENCE source: chrome ribbon and theatre bulb borders on a see-through background.
+
+- **Chrome Ribbon**: A liquid-metal frame that flows and ripples on the beat, with thin-film colour and a soft shadow cast onto your content.  
+  _Controls:_ Width, Flow, Iridescence, Beat ripple, Inner shadow, Detail
+- **Bulb Marquee**: A theatre marquee of light bulbs around the frame. The chase pattern changes every bar: run, blink, opposing comets, sparkle.  
+  _Controls:_ Inset, Bulb count, Glow, Chase speed, Warm → rainbow, Housing
+
+## IM Caustics Src
+
+IMMINENCE source: underwater light overlays on a see-through background.
+
+- **Classic**: Underwater light caustics dance across the clip and bend it, like the whole stage is at the bottom of a pool.  
+  _Controls:_ Scale, Speed, Intensity, Refraction, Tint, Deep water
+- **God Rays**: Deep-water look: caustics on the clip, slanted light shafts falling from the surface and drifting particles.  
+  _Controls:_ Scale, Speed, Caustic strength, Ray strength, Particles, Deep water
+- **Prism**: Caustics split into red, green and blue so every light line carries a rainbow fringe, over a darkened, refracted clip.  
+  _Controls:_ Scale, Speed, Intensity, Dispersion, Darken clip, Refraction
+- **Raindrops**: Drops land on the beat and send rippling rings across the clip, bending it and catching highlights, over a faint caustic floor.  
+  _Controls:_ Drops (1 per beat / 2 per beat / 4 per beat), Ripple speed, Persistence, Refraction, Highlight, Caustic floor
 
 ## IM Liquid Wipe
 

@@ -918,6 +918,216 @@
   ]
  },
  {
+  "plugin": "IM Slice Src",
+  "style": "Liquid",
+  "desc": "White light flows around each LED slice like liquid. Streaks stretch, taper, split and drain away unpredictably, thinning to fine tips.",
+  "controls": [
+   "Slices",
+   "Centre slice width",
+   "Inset",
+   "Corner radius",
+   "Amount of light",
+   "Flow speed",
+   "Thickness",
+   "Glow"
+  ]
+ },
+ {
+  "plugin": "IM Slice Src",
+  "style": "Mercury",
+  "desc": "Liquid metal running around each slice: rounded silver beads that swell, merge and split, catching a moving highlight.",
+  "controls": [
+   "Slices",
+   "Centre slice width",
+   "Inset",
+   "Corner radius",
+   "Amount of light",
+   "Flow speed",
+   "Thickness",
+   "Shine"
+  ]
+ },
+ {
+  "plugin": "IM Slice Src",
+  "style": "Neon Liquid",
+  "desc": "The same liquid flow in colour: streams of neon whose hue drifts along the outline, with a white-hot core and soft bloom.",
+  "controls": [
+   "Slices",
+   "Centre slice width",
+   "Inset",
+   "Corner radius",
+   "Amount of light",
+   "Flow speed",
+   "Hue",
+   "Colour spread"
+  ]
+ },
+ {
+  "plugin": "IM Slice Src",
+  "style": "Surge",
+  "desc": "Calm liquid streaks until the beat hits: then a surge pours from the top of each slice and races down both sides before draining away.",
+  "controls": [
+   "Slices",
+   "Centre slice width",
+   "Inset",
+   "Corner radius",
+   "Amount of light",
+   "Surge strength",
+   "Surge speed",
+   "Glow"
+  ]
+ },
+ {
+  "plugin": "IM Slice Src",
+  "style": "Braid",
+  "desc": "Two liquid streams, one white and one in an accent colour, weave over and under each other as they flow around every slice.",
+  "controls": [
+   "Slices",
+   "Centre slice width",
+   "Inset",
+   "Corner radius",
+   "Amount of light",
+   "Flow speed",
+   "Braid width",
+   "Accent hue"
+  ]
+ },
+ {
+  "plugin": "IM Slice Src",
+  "style": "Spill",
+  "desc": "The liquid outline spills light into each slice: wherever a streak flows, a soft wash bleeds inward and ripples, then fades as the streak moves on.",
+  "controls": [
+   "Slices",
+   "Centre slice width",
+   "Inset",
+   "Corner radius",
+   "Amount of light",
+   "Flow speed",
+   "Spill depth",
+   "Tint (0 = white)"
+  ]
+ },
+ {
+  "plugin": "IM Halo Src",
+  "style": "Glass Frame",
+  "desc": "A premium frosted-glass frame: the clip blurs into the glass band, a soft light glides along the inner edge, and the window casts a gentle shadow inward. Built for keynotes, award shows and concerts.",
+  "controls": [
+   "Width",
+   "Corner radius",
+   "Frost",
+   "Edge light",
+   "Glide speed",
+   "Hue",
+   "Tint",
+   "Beat breathe"
+  ]
+ },
+ {
+  "plugin": "IM Halo Src",
+  "style": "Aurora",
+  "desc": "A fine line of light around the frame with aurora colours flowing along it and soft curtains drifting inward.",
+  "controls": [
+   "Inset",
+   "Corner radius",
+   "Flow speed",
+   "Hue",
+   "Curtain depth",
+   "Beat lift"
+  ]
+ },
+ {
+  "plugin": "IM Halo Src",
+  "style": "Corners",
+  "desc": "Minimal broadcast framing: corner brackets that redraw every 4 bars, a hairline frame, ruler ticks, centre marks and a light that travels the edge.",
+  "controls": [
+   "Inset",
+   "Bracket length",
+   "Thickness",
+   "Detail lines",
+   "Hue",
+   "Colour amount",
+   "Beat pulse"
+  ]
+ },
+ {
+  "plugin": "IM Borders Src",
+  "style": "Chrome Ribbon",
+  "desc": "A liquid-metal frame that flows and ripples on the beat, with thin-film colour and a soft shadow cast onto your content.",
+  "controls": [
+   "Width",
+   "Flow",
+   "Iridescence",
+   "Beat ripple",
+   "Inner shadow",
+   "Detail"
+  ]
+ },
+ {
+  "plugin": "IM Borders Src",
+  "style": "Bulb Marquee",
+  "desc": "A theatre marquee of light bulbs around the frame. The chase pattern changes every bar: run, blink, opposing comets, sparkle.",
+  "controls": [
+   "Inset",
+   "Bulb count",
+   "Glow",
+   "Chase speed",
+   "Warm \u2192 rainbow",
+   "Housing"
+  ]
+ },
+ {
+  "plugin": "IM Caustics Src",
+  "style": "Classic",
+  "desc": "Underwater light caustics dance across the clip and bend it, like the whole stage is at the bottom of a pool.",
+  "controls": [
+   "Scale",
+   "Speed",
+   "Intensity",
+   "Refraction",
+   "Tint",
+   "Deep water"
+  ]
+ },
+ {
+  "plugin": "IM Caustics Src",
+  "style": "God Rays",
+  "desc": "Deep-water look: caustics on the clip, slanted light shafts falling from the surface and drifting particles.",
+  "controls": [
+   "Scale",
+   "Speed",
+   "Caustic strength",
+   "Ray strength",
+   "Particles",
+   "Deep water"
+  ]
+ },
+ {
+  "plugin": "IM Caustics Src",
+  "style": "Prism",
+  "desc": "Caustics split into red, green and blue so every light line carries a rainbow fringe, over a darkened, refracted clip.",
+  "controls": [
+   "Scale",
+   "Speed",
+   "Intensity",
+   "Dispersion",
+   "Darken clip",
+   "Refraction"
+  ]
+ },
+ {
+  "plugin": "IM Caustics Src",
+  "style": "Raindrops",
+  "desc": "Drops land on the beat and send rippling rings across the clip, bending it and catching highlights, over a faint caustic floor.",
+  "controls": [
+   "Drops",
+   "Ripple speed",
+   "Persistence",
+   "Refraction",
+   "Highlight",
+   "Caustic floor"
+  ]
+ },
+ {
   "plugin": "IM Liquid Wipe",
   "style": "Liquid Wipe",
   "desc": "B floods in behind an organic liquid front with a glowing rim that bends both pictures as it passes. Set any angle.",

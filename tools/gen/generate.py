@@ -69,6 +69,20 @@ FAMILIES = [
     ('Time', 'IMTI', 'IM Time', 'effect',
      'IMMINENCE: time effects built on a frame buffer.',
      [('slitscan', 'Slit Scan'), ('timesplit', 'RGB Time Split'), ('timetiles', 'Time Tiles')]),
+    # border and overlay sources: the same looks drawn on a see-through background, as their own clips
+    ('SliceTraceSrc', 'IMSS', 'IM Slice Src', 'source',
+     'IMMINENCE source: liquid light outlines for LED slices, on a see-through background.',
+     [('slicetrace', 'Liquid'), ('slice-mercury', 'Mercury'), ('slice-neon', 'Neon Liquid'),
+      ('slice-surge', 'Surge'), ('slice-braid', 'Braid'), ('slice-spill', 'Spill')]),
+    ('HaloSrc', 'IMHS', 'IM Halo Src', 'source',
+     'IMMINENCE source: premium frames on a see-through background.',
+     [('halo', 'Glass Frame'), ('halo-aurora', 'Aurora'), ('halo-corners', 'Corners')]),
+    ('BordersSrc', 'IMBS', 'IM Borders Src', 'source',
+     'IMMINENCE source: chrome ribbon and theatre bulb borders on a see-through background.',
+     [('chrome', 'Chrome Ribbon'), ('marquee', 'Bulb Marquee')]),
+    ('CausticsSrc', 'IMCS', 'IM Caustics Src', 'source',
+     'IMMINENCE source: underwater light overlays on a see-through background.',
+     [('caustics', 'Classic'), ('caus-rays', 'God Rays'), ('caus-prism', 'Prism'), ('caus-rain', 'Raindrops')]),
     # transitions: one plugin each so they can be picked by name in Arena's transition list
     ('TrLiquidWipe', 'IMT0', 'IM Liquid Wipe', 'mixer', 'IMMINENCE transition: liquid front with a glossy rim.', [('tr-liquid', 'Liquid Wipe')]),
     ('TrFlashBurn', 'IMT1', 'IM Flash Burn', 'mixer', 'IMMINENCE transition: overexposed flash reveal.', [('tr-flash', 'Flash Burn')]),
@@ -326,7 +340,7 @@ DOCS = os.path.join(ROOT, 'docs'); os.makedirs(DOCS, exist_ok=True)
 with open(os.path.join(DOCS, 'CONTROLS.md'), 'w') as f:
     f.write('# Every IMMINENCE plugin, style and control\n\n')
     f.write('Generated from the plugin tables. Every plugin also has **Beat punch** (how hard beat-synced moves hit; not on transitions), '
-            '**Mix** (effects only: 0% = untouched clip, 100% = full effect), **Quality** (High / Medium / Low; lower is lighter on the '
+            '**Mix** (effects only: 0% = untouched clip, 100% = full effect), **Background** (sources only: See-through or Black), **Quality** (High / Medium / Low; lower is lighter on the '
             'graphics card) and **Unlock code**. Transitions also have **Opacity**, which Arena moves for you during a transition.\n')
     last = None
     for fname, fid, aname, kind, desc, styles in FAMILIES:

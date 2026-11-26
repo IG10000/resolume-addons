@@ -4,7 +4,7 @@
 //
 //   imhost <plugin.so> [--list] [--style N] [--set index=value] [--text index=string] [--unlock code]
 //          [--source stage|loop] [--size WxH] [--frames N] [--shots a,b,c] [--progress p | --sweep]
-//          [--out file_prefix] [--bpm N]
+//          [--out file_prefix] [--bpm N] [--alpha]   (--alpha keeps transparency in the PNGs)
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <dlfcn.h>
@@ -150,7 +150,7 @@ int main( int argc, char** argv )
 	std::string path = argv[ 1 ], source = "stage", out = "shot", unlock;
 	int W = 960, H = 540, frames = 40, style = -1;
 	float bpm = 124.f, progress = -1.f;
-	bool list = false, sweep = false;
+	bool list = false, sweep = false, keepAlpha = false;
 	std::vector< std::pair< int, float > > sets;
 	std::vector< std::pair< int, std::string > > texts;
 	std::set< int > shots;
@@ -169,6 +169,7 @@ int main( int argc, char** argv )
 		else if( a == "--shots" ) { std::string v = next(); size_t s = 0; while( s < v.size() ) { size_t e = v.find( ',', s ); if( e == std::string::npos ) e = v.size(); shots.insert( atoi( v.substr( s, e - s ).c_str() ) ); s = e + 1; } }
 		else if( a == "--progress" ) progress = (float)atof( next().c_str() );
 		else if( a == "--sweep" ) sweep = true;
+		else if( a == "--alpha" ) keepAlpha = true;
 		else if( a == "--out" ) out = next();
 		else if( a == "--bpm" ) bpm = (float)atof( next().c_str() );
 	}
@@ -322,7 +323,7 @@ int main( int argc, char** argv )
 				memcpy( &px[ (size_t)y * W * 4 ], &px[ (size_t)( H - 1 - y ) * W * 4 ], W * 4 );
 				memcpy( &px[ (size_t)( H - 1 - y ) * W * 4 ], row.data(), W * 4 );
 			}
-			for( size_t k = 0; k < px.size(); k += 4 ) { alphaSum += px[ k + 3 ]; px[ k + 3 ] = 255; }
+			for( size_t k = 0; k < px.size(); k += 4 ) { alphaSum += px[ k + 3 ]; if( !keepAlpha ) px[ k + 3 ] = 255; }
 			char fn[ 512 ];
 			snprintf( fn, sizeof( fn ), "%s_f%03d.png", out.c_str(), f );
 			stbi_write_png( fn, W, H, 4, px.data(), W * 4 );

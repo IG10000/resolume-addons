@@ -42,6 +42,7 @@ uniform float uKind;         // 0 effect, 1 source, 2 transition
 uniform float uMix;          // effects: how much of the effect is used
 uniform float uProgress;     // transitions: crossfade position
 uniform float uLocked;       // 1 = draw the IMMINENCE watermark
+uniform float uOpaque;       // sources: 1 = black background instead of see-through
 uniform float uTime;
 uniform vec2 uRes;
 in vec2 vUv;
@@ -130,7 +131,7 @@ void main()
 	else if( uKind < 1.5 )
 	{
 		col   = fx.rgb;
-		alpha = clamp( max( max( fx.r, fx.g ), fx.b ) * 2.0, 0.0, 1.0 );
+		alpha = uOpaque > .5 ? 1.0 : clamp( max( max( fx.r, fx.g ), fx.b ) * 2.0, 0.0, 1.0 );
 	}
 	else
 	{

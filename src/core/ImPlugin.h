@@ -37,6 +37,7 @@ private:
 		R_FONT,
 		R_BEAT,
 		R_MIX,
+		R_BACKGROUND,// sources: see-through or black behind the drawing
 		R_QUALITY,
 		R_UNLOCK
 	};
@@ -84,6 +85,7 @@ private:
 	const ImFamilyDef& family;
 	std::vector< HostParam > params;
 	int styleParam = -1, wordParam = -1, fontParam = -1, beatParam = -1, mixParam = -1, qualityParam = -1;
+	int backgroundParam = -1;
 	int unlockParam = -1, progressParam = -1;
 	bool needsText = false;
 

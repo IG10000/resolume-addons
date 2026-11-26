@@ -30,7 +30,7 @@ jobs:
           Copy-Item docs/HOW-TO-INSTALL.txt $dir
           $count = (Get-ChildItem $dir -Filter *.dll).Count
           Write-Host "Packaged $count plugins"
-          if ($count -ne 25) { throw "Expected 25 plugins, got $count" }
+          if ($count -ne 29) { throw "Expected 29 plugins, got $count" }
           Compress-Archive -Path $dir -DestinationPath dist/IMMINENCE-Windows.zip -Force
 
       - uses: actions/upload-artifact@v4

@@ -11,6 +11,8 @@ IMMINENCE VJ PACK - HOW TO INSTALL (Resolume Arena 7, Windows)
    extra plugins from, if yours is somewhere else.)
 
 3. Open Arena. Search "IM " in the Effects, Sources and Transitions lists to find everything.
+   Border and overlay looks are in BOTH lists: as effects (IM Slice Trace...) and as
+   see-through sources (IM Slice Src, IM Halo Src, IM Borders Src, IM Caustics Src).
 
 4. Unlock: add any IMMINENCE effect, find the "Unlock code" box at the bottom of its
    controls, type your code and press Enter. Every IMMINENCE plugin on this computer unlocks,

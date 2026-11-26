@@ -12,6 +12,7 @@ using namespace ffglex;
 namespace
 {
 const char* kQualityLabels[] = { "High", "Medium", "Low" };
+const char* kBackgroundLabels[] = { "See-through", "Black" };
 const float kQualityScale[]  = { 1.0f, 0.75f, 0.5f };
 const char* kDefaultWord     = "IMMINENCE";
 const int kHistFrames        = 48;
@@ -76,6 +77,8 @@ ImPlugin::ImPlugin( const ImFamilyDef& fam ) :
 		beatParam = AddHostParam( { R_BEAT } );
 	if( family.kind == IM_KIND_EFFECT )
 		mixParam = AddHostParam( { R_MIX } );
+	if( family.kind == IM_KIND_SOURCE )
+		backgroundParam = AddHostParam( { R_BACKGROUND } );
 	qualityParam = AddHostParam( { R_QUALITY } );
 	unlockParam  = AddHostParam( { R_UNLOCK } );
 
@@ -151,6 +154,13 @@ int ImPlugin::AddHostParam( HostParam p )
 		SetParamInfo( i, "Mix", FF_TYPE_STANDARD, 1.0f );
 		SetParamGroup( i, "Output" );
 		p.value = 1.0f;
+		break;
+	case R_BACKGROUND:
+		SetOptionParamInfo( i, "Background", 2, 0.0f );
+		for( int k = 0; k < 2; ++k )
+			SetParamElementInfo( i, (unsigned int)k, kBackgroundLabels[ k ], (float)k );
+		SetParamGroup( i, "Output" );
+		p.value = 0.0f;
 		break;
 	case R_QUALITY:
 		SetOptionParamInfo( i, "Quality", 3, 0.0f );
@@ -234,6 +244,7 @@ FFResult ImPlugin::SetFloatParameter( unsigned int index, float value )
 	}
 	case R_FONT:
 	case R_QUALITY:
+	case R_BACKGROUND:
 		p.value = std::round( value );
 		break;
 	case R_STYLE_PARAM:
@@ -297,6 +308,9 @@ char* ImPlugin::GetParameterDisplay( unsigned int index )
 	}
 	case R_QUALITY:
 		std::snprintf( buf, sizeof( buf ), "%s", kQualityLabels[ std::max( 0, std::min( 2, (int)std::lround( p.value ) ) ) ] );
+		break;
+	case R_BACKGROUND:
+		std::snprintf( buf, sizeof( buf ), "%s", kBackgroundLabels[ std::max( 0, std::min( 1, (int)std::lround( p.value ) ) ) ] );
 		break;
 	case R_WORD:
 	case R_UNLOCK:
@@ -797,6 +811,7 @@ FFResult ImPlugin::ProcessOpenGL( ProcessOpenGLStruct* pGL )
 	glUniform1f( glGetUniformLocation( compProg, "uMix" ), mixParam >= 0 ? params[ mixParam ].value : 1.0f );
 	glUniform1f( glGetUniformLocation( compProg, "uProgress" ), progressParam >= 0 ? params[ progressParam ].value : 0.0f );
 	glUniform1f( glGetUniformLocation( compProg, "uLocked" ), locked ? 1.0f : 0.0f );
+	glUniform1f( glGetUniformLocation( compProg, "uOpaque" ), backgroundParam >= 0 && params[ backgroundParam ].value > 0.5f ? 1.0f : 0.0f );
 	glUniform1f( glGetUniformLocation( compProg, "uTime" ), (float)std::fmod( seconds, 3600.0 ) );
 	glUniform2f( glGetUniformLocation( compProg, "uRes" ), (float)W, (float)H );
 	quad.Draw();

@@ -1,6 +1,6 @@
 # IMMINENCE VJ Pack for Resolume Arena
 
-25 plugins for **Resolume Arena 7 on Windows**: borders, auras, live-camera looks, overlays, masks, kinetic type,
+29 plugins for **Resolume Arena 7 on Windows**: borders, auras, live-camera looks, overlays, masks, kinetic type,
 feedback, time effects and transitions. Every effect follows Arena's BPM.
 
 - **Download:** go to [Releases](../../releases), open the newest release, download **IMMINENCE-Windows.zip**.
@@ -24,6 +24,10 @@ feedback, time effects and transitions. Every effect follows Arena's BPM.
 | **IM Reveal** | Effect: cut-outs and dissolves | Type Cutout, Flip Grid, Disintegrate |
 | **IM Type** | Effect: kinetic type over your clip | Carousel, Wave, Cylinder, Slam, Echo Stack |
 | **IM Type Source** | Source: kinetic type on its own | Carousel, Wave, Cylinder, Slam, Echo Stack |
+| **IM Slice Src** | Source: Slice Trace as its own clip, see-through | Liquid, Mercury, Neon Liquid, Surge, Braid, Spill |
+| **IM Halo Src** | Source: Halo frames as their own clip | Glass Frame, Aurora, Corners |
+| **IM Borders Src** | Source: classic borders as their own clip | Chrome Ribbon, Bulb Marquee |
+| **IM Caustics Src** | Source: underwater light as its own clip | Classic, God Rays, Prism, Raindrops |
 | **IM Stylize** | Effect: looks | LED Wall, Contour, Edge Neon, ASCII, Rutt-Etra, Op-Art |
 | **IM Echo** | Effect: feedback trails | Tunnel, Kaleido, Vortex, Stutter |
 | **IM Melt** | Effect: liquid feedback | Paint, Drip, Marble, Inferno |
@@ -38,7 +42,7 @@ feedback, time effects and transitions. Every effect follows Arena's BPM.
 2. **Download** `IMMINENCE-Windows.zip` from [Releases](../../releases).
 3. **Unblock it** (Windows sometimes blocks downloaded plugins): right-click the zip → **Properties** → tick
    **Unblock** → **OK**.
-4. **Unzip it.** Inside the `IMMINENCE` folder are 25 files that end in `.dll`.
+4. **Unzip it.** Inside the `IMMINENCE` folder are 29 files that end in `.dll`.
 5. **Copy all the `.dll` files** into Arena's plugin folder: `Documents\Resolume Arena\Extra Effects`.
    If the folder isn't there, make it. Arena's Preferences show the folder it reads extra plugins from, if yours is
    somewhere else.
@@ -80,6 +84,20 @@ Think of your show like a stack of see-through sheets of glass:
 
 Effects run top to bottom, like a recipe. Put a key (cut-out) effect **before** an Aura effect so the aura grows around
 the cut-out person.
+
+### Borders as sources (their own clip)
+
+The border and caustics looks also come as **sources**: IM Slice Src, IM Halo Src, IM Borders Src and IM Caustics Src.
+A source makes its own picture, so it lives in a clip slot like a video:
+
+1. Drag **IM Slice Src** (or another) from the **Sources** list into a clip slot on a **layer above your content**.
+2. Pick the **Style**. The background is **see-through**, so your content shows behind the lines.
+3. In **Advanced Output**, send that layer to your LED slices like any other layer. Because it's its own layer, you
+   can give it its own slices, or route it only to the side screens, without touching your content.
+
+**Background** switches between **See-through** (an overlay) and **Black** (the border on its own).
+One difference: **Glass Frame** can't frost the picture under it when it's a source, because a source can't see the
+other layers. Use the **IM Halo** effect for the frosted look.
 
 ### Slice Trace and your LED slices
 

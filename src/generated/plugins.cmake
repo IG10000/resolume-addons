@@ -15,6 +15,10 @@ set(IM_PLUGINS
   Echo
   Melt
   Time
+  SliceTraceSrc
+  HaloSrc
+  BordersSrc
+  CausticsSrc
   TrLiquidWipe
   TrFlashBurn
   TrWhipZoom
